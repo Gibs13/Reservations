@@ -21,7 +21,7 @@ let sprintf = require('sprintf-js').sprintf;
 app.post('/', function (req, res) {
     const assistant = new ApiAiApp({request: req, response: res});
 
-    function goodDate(assisstant) {
+    function goodDate(assistant) {
 
         let date = assistant.getArgument('date').date;
         console.log(date);
@@ -46,11 +46,11 @@ app.post('/', function (req, res) {
 
 
 
-        assistant.ask(assisstant.data.city);
+        assistant.ask(assistant.data.city);
     }
 
-    function quit (assisstant) {
-        assisstant.tell('Goodbye!');
+    function quit (assistant) {
+        assistant.tell('Goodbye!');
     }
 
 
