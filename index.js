@@ -23,7 +23,7 @@ app.post('/', function (req, res) {
 
     function goodDate(assisstant) {
 
-        let date = assistant.getArgument('date');
+        let date = assistant.getArgument('date').date;
         console.log(date);
         let today = new Date();
         
