@@ -24,8 +24,9 @@ app.post('/', function (req, res) {
     function goodDate(assisstant) {
 
         let date = assistant.getArgument('date');
+        console.log(date);
         let today = new Date();
-
+        
         today = [today.getDate(),today.getMonth()];
         date = [date.substring(8),date.substring(5,7)-1];
         console.log(today + '  ' + date)
