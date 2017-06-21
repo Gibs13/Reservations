@@ -40,7 +40,7 @@ app.post('/', function (req, res) {
     function reserve (assistant) {
 
         goodDate(assistant);
-        assisstant.data.city = assistant.getArgument('city')
+        assistant.data.city = assistant.getArgument('city')
 
 
 
