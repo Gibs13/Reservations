@@ -28,7 +28,7 @@ app.post('/', function (req, res) {
         let today = new Date();
         
         today = [today.getDate(),today.getMonth()];
-        date = [date.substring(8),date.substring(5,7)-1];
+        date = [date.substring(8,10),date.substring(5,7)-1];
         console.log(today + '  ' + date)
         if (date[1]<today[1] || date[0]<today[0]-7) {
             console.log('plus un mois');
