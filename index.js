@@ -57,8 +57,8 @@ app.post('/', function (req, res) {
 
     let actionMap = new Map();
 
-    actionMap.set(RESERVE_ACTION, reserve);
-    actionMap.set(QUIT_ACTION, quit);
+    actionMap.set('reserve', reserve);
+    actionMap.set('quit', quit);
 
     assistant.handleRequest(actionMap);
 });
