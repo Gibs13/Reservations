@@ -14,6 +14,10 @@ let sprintf = require('sprintf-js').sprintf;
 
 
 
+const WELCOME_STATE = 'welcome';
+const CHOOSE_R_STATE = 'r';
+const CHOOSE_D_STATE = 'd';
+const CHOOSE_N_STATE = 'n';
 
 
 // Function Handler
