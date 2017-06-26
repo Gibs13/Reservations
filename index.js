@@ -71,7 +71,7 @@ app.post('/', function (req, res) {
 
     function get_Date (assistant) {
         if (!assistant.data.date && (assistant.getArgument('datebis') == null)) {
-            if (assistant.getArgument('time')) {
+            if (assistant.getArgument('timebis')) {
                 let today = new Date();
                 let month = (today.getMonth()+1) < 10 ? '0' + (today.getMonth()+1).toString() : (today.getMonth()+1).toString();
                 let day = today.getDate() < 10 ? '0' + today.getDate().toString() : today.getDate().toString();
@@ -141,7 +141,7 @@ app.post('/', function (req, res) {
         goodDate(assistant);
         let restaurant = assistant.data.restaurant;
         let date = assistant.data.date;
-        let time = assistant.getArgument('time');
+        let time = assistant.getArgument('timebis');
         let dispo = horraires[restaurant][date];
         
         console.log('horraires : ' + dispo)
@@ -167,7 +167,7 @@ app.post('/', function (req, res) {
 
             console.log("min : "+min+" max : "+max+" timebis : "+timebis);
 
-                if (min<time && time<max) {
+                if (min<timebis && timebis<max) {
                     assistant.ask("A " + date + " au " + restaurant);
                     return;
                 }
