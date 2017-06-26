@@ -133,7 +133,12 @@ app.post('/', function (req, res) {
         let restaurant = assistant.data.restaurant;
         let date = assistant.data.date;
         let time = assistant.getArgument('date').time;
-        console.log(horraires[restaurant][date])
+        
+        console.log('temps : ' + time)
+        console.log('restaurant : ' + restaurant)
+        console.log('date : ' + date)
+        console.log('horrairesComplet : ' + horraires[restaurant])
+        console.log('horraires : ' + horraires[restaurant][date])
         
         if (!horraires[restaurant][date]) {
             assistant.ask("Pas ouvert ce jour-ci")
