@@ -63,10 +63,11 @@ app.post('/', function (req, res) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
-        console.log('assistant.data.restaurant')
+        console.log(assistant.data.restaurant)
         if (!assistant.data.restaurant || assistant.data.state == CHOOSE_R_STATE) {
             assistant.data.restaurant = assistant.getArgument('city');
         }
+        return false;
     }
 
     function get_Date (assistant) {
@@ -77,6 +78,7 @@ app.post('/', function (req, res) {
         if (!assistant.data.date || assistant.data.state == CHOOSE_D_STATE) {
             assistant.data.date = assistant.getArgument('date').date;
         }
+        return false;
     }
 
     function get_Name (assistant) {
