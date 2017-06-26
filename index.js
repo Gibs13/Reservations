@@ -63,15 +63,20 @@ app.post('/', function (req, res) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
-        assistant.data.restaurant = assistant.getArgument('city');
+        console.log('assistant.data.restaurant')
+        if (!assistant.data.restaurant || assistant.data.state == CHOOSE_R_STATE) {
+            assistant.data.restaurant = assistant.getArgument('city');
+        }
     }
 
     function get_Date (assistant) {
-        if (assistant.getArgument('date').date == null) {
+        if (assistant.getArgument('date') == null || assistant.getArgument('date').date == null ) {
             assistant.data.state = CHOOSE_D_STATE;
             return true;
         }
-        assistant.data.date = assistant.getArgument('date').date;
+        if (!assistant.data.date || assistant.data.state == CHOOSE_D_STATE) {
+            assistant.data.date = assistant.getArgument('date').date;
+        }
     }
 
     function get_Name (assistant) {
