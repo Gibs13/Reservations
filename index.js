@@ -69,12 +69,12 @@ app.post('/', function (req, res) {
     }
 
     function get_Date (assistant) {
-        if (!assistant.data.date && (assistant.getArgument('date') == null || assistant.getArgument('date').date == null )) {
+        if (!assistant.data.date && (assistant.getArgument('datebis') == null)) {
             assistant.data.state = CHOOSE_D_STATE;
             return true;
         }
         if (!assistant.data.date || assistant.data.state == CHOOSE_D_STATE) {
-            assistant.data.date = assistant.getArgument('date').date;
+            assistant.data.date = assistant.getArgument('datebis');
             assistant.data.state = RESERVE_STATE;
         }
         return false;
@@ -132,7 +132,7 @@ app.post('/', function (req, res) {
         goodDate(assistant);
         let restaurant = assistant.data.restaurant;
         let date = assistant.data.date;
-        let time = assistant.getArgument('date').time;
+        let time = assistant.getArgument('time');
         let dispo = horraires[restaurant][date];
         
         console.log('horraires : ' + dispo)
