@@ -15,6 +15,7 @@ let sprintf = require('sprintf-js').sprintf;
 
 
 const WELCOME_STATE = 'welcome';
+const RESERVE_STATE = 'reserve'
 const CHOOSE_R_STATE = 'r';
 const CHOOSE_D_STATE = 'd';
 const CHOOSE_N_STATE = 'n';
@@ -59,35 +60,30 @@ app.post('/', function (req, res) {
     }
 
     function get_Restaurant (assistant) {
-        if (assistant.getArgument('city') == null) {
+        if (!assistant.data.restaurant && assistant.getArgument('city') == null) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
-        console.log(assistant.data.restaurant)
-        if (!assistant.data.restaurant || assistant.data.state == CHOOSE_R_STATE) {
+        if (assistant.data.state == CHOOSE_R_STATE) {
             assistant.data.restaurant = assistant.getArgument('city');
+            assistant.data.state = RESERVE_STATE;
         }
         return false;
     }
 
     function get_Date (assistant) {
-        if (assistant.getArgument('date') == null || assistant.getArgument('date').date == null ) {
+        if (!assistant.data.date && (assistant.getArgument('date') == null || assistant.getArgument('date').date == null )) {
             assistant.data.state = CHOOSE_D_STATE;
             return true;
         }
-        if (!assistant.data.date || assistant.data.state == CHOOSE_D_STATE) {
+        if (assistant.data.state == CHOOSE_D_STATE) {
             assistant.data.date = assistant.getArgument('date').date;
+            assistant.data.state = RESERVE_STATE;
         }
         return false;
     }
 
     function get_Name (assistant) {
-        if (assistant.getArgument('name') == null) {
-            assistant.data.state = CHOOSE_N_STATE;
-            return true;
-        }
-        assistant.data.name = assistant.getArgument('name');
-
     }
 
     function confirmation () {
