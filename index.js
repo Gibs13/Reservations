@@ -58,7 +58,7 @@ app.post('/', function (req, res) {
     }
 
     function get_Restaurant (assistant) {
-        if (assistant.getArgument('restaurant') == null) {
+        if (assistant.getArgument('city') == null) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
