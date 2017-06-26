@@ -72,7 +72,9 @@ app.post('/', function (req, res) {
         if (!assistant.data.date && (assistant.getArgument('datebis') == null)) {
             if (assistant.getArgument('time')) {
                 let today = new Date();
-                assistant.data.date = today.getFullYear().toString()+'-'+today.getMonth().toString()+'-'+today.getDate().toString();
+                let month = today.getMonth() < 10 ? '0' + today.getMonth().toString() : today.getMonth().toString();
+                let day = today.getDate() < 10 ? '0' + today.getDate().toString() : today.getDate().toString();
+                assistant.data.date = today.getFullYear().toString()+'-'+month+'-'+day;
                 return false;
             }
             assistant.data.state = CHOOSE_D_STATE;
