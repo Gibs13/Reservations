@@ -139,7 +139,7 @@ app.post('/', function (req, res) {
         console.log('date : ' + date)
         console.log('horrairesComplet : ' + horraires[restaurant])
         console.log('horraires : ' + horraires[restaurant][date])
-        
+
         if (!horraires[restaurant][date]) {
             assistant.ask("Pas ouvert ce jour-ci")
         } else if (time != null) {
