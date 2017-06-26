@@ -133,24 +133,39 @@ app.post('/', function (req, res) {
         let restaurant = assistant.data.restaurant;
         let date = assistant.data.date;
         let time = assistant.getArgument('date').time;
+        let dispo = horraires[restaurant][date];
         
-        console.log('temps : ' + time)
-        console.log('restaurant : ' + restaurant)
-        console.log('date : ' + date)
-        console.log('horrairesComplet : ' + horraires[restaurant])
-        console.log('horraires : ' + horraires[restaurant][date])
+        console.log('horraires : ' + dispo)
 
-        if (!horraires[restaurant][date]) {
+        if (!dispo) {
             assistant.ask("Pas ouvert ce jour-ci")
-        } else if (time != null) {
+            return;
+        } else if (time == undefined) {
             let hours = 'Le restaurant est ouvert :\n'
-            for (let i = 0; i<horraires[restaurant][date].length;i++) {
-            hours += 'de ' + horraires[restaurant][date][i].substring(0,2) + ' à ' + horraires[restaurant][date][i].substring(9,11) + '.\n' ;
+            for (let i = 0; i<dispo.length;i++) {
+            hours += 'de ' + dispo[i].substring(0,2) + ' à ' + dispo[i].substring(9,11) + '.\n' ;
             }
             assistant.data.state = CHOOSE_T_STATE;
             assistant.ask(hours + "A quelle heure souhaitez vous vous y rendre ?");
+            return;
+        } else {
+            let min;
+            let max;
+            let timebis = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
+            for (let i = 0; i<dispo.length;i++) {
+            min = parseInt(dispo[i].substring(0,2))*60 + parseInt(dispo[i].substring(3,5));
+            max = parseInt(dispo[i].substring(9,11))*60 + parseInt(dispo[i].substring(12,14));
+
+            console.log("min : "+min+" max : "+max+" timebis : "+timebis);
+
+                if (min<time && time<max) {
+                    assistant.ask("A " + date + " au " + restaurant);
+                    return;
+                }
+            }
+            assistant.ask("Pas ouvert a cette heure.");
+            return;
         }
-        assistant.ask("A " + date + "au " + restaurant);
     }
 
     function yes (assistant) {
