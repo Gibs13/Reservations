@@ -56,13 +56,14 @@ app.post('/', function (req, res) {
     }
 
     function get_Restaurant (assistant) {
-        if (!assistant.data.restaurant && assistant.getArgument('restaurant') == null) {
+        if (!assistant.data.restaurant && assistant.getArgument('resto') == null) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
+        console.log("lel " + !undefined);
         console.log(assistant.data.restaurant);
-        if (!assistant.data.restaurant || assistant.data.state == CHOOSE_R_STATE) {
-            assistant.data.restaurant = assistant.getArgument('restaurant');
+        if (assistant.data.restaurant == undefined || assistant.data.state == CHOOSE_R_STATE) {
+            assistant.data.restaurant = assistant.getArgument('resto');
             assistant.data.state = RESERVE_STATE;
         }
         return false;
@@ -80,7 +81,8 @@ app.post('/', function (req, res) {
             assistant.data.state = CHOOSE_D_STATE;
             return true;
         }
-        if (!assistant.data.date || assistant.data.state == CHOOSE_D_STATE) {
+        console.log(assistant.data.date);
+        if (assistant.data.date == undefined || assistant.data.state == CHOOSE_D_STATE) {
             assistant.data.date = assistant.getArgument('datebis');
             assistant.data.state = RESERVE_STATE;
         }
