@@ -65,7 +65,7 @@ app.post('/', function (req, res) {
             return true;
         }
         console.log(assistant.data.restaurant);
-        if (assistant.data.restaurant == undefined || assistant.data.state == CHOOSE_R_STATE) {
+        if (!assistant.data.restaurant || assistant.data.state == CHOOSE_R_STATE) {
             assistant.data.restaurant = assistant.getArgument('city');
             assistant.data.state = RESERVE_STATE;
         }
@@ -77,7 +77,7 @@ app.post('/', function (req, res) {
             assistant.data.state = CHOOSE_D_STATE;
             return true;
         }
-        if (!assistant.data.date == undefined || assistant.data.state == CHOOSE_D_STATE) {
+        if (!assistant.data.date || assistant.data.state == CHOOSE_D_STATE) {
             assistant.data.date = assistant.getArgument('date').date;
             assistant.data.state = RESERVE_STATE;
         }
