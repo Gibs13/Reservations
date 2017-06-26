@@ -15,7 +15,7 @@ let sprintf = require('sprintf-js').sprintf;
 
 
 const WELCOME_STATE = 'welcome';
-const RESERVE_STATE = 'reserve'
+const RESERVE_STATE = 'reserve';
 const CHOOSE_R_STATE = 'r';
 const CHOOSE_D_STATE = 'd';
 const CHOOSE_N_STATE = 'n';
@@ -64,6 +64,7 @@ app.post('/', function (req, res) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
+        console.log(assistant.data.restaurant);
         if (assistant.data.restaurant == undefined || assistant.data.state == CHOOSE_R_STATE) {
             assistant.data.restaurant = assistant.getArgument('city');
             assistant.data.state = RESERVE_STATE;
