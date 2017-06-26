@@ -1,3 +1,3 @@
 "use strict";
 
-module.exports = [Nice, Marseille]
+module.exports = ["Nice", "Marseille"]
