@@ -62,7 +62,7 @@ app.post('/', function (req, res) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
-        assistant.data.restaurant = assistant.getArgument('restaurant');
+        assistant.data.restaurant = assistant.getArgument('city');
     }
 
     function get_Date (assistant) {
