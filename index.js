@@ -35,7 +35,7 @@ app.post('/', function (req, res) {
         let today = new Date();
         
         today = [today.getDate(),today.getMonth()+1];
-        date = [date.substring(8,10),date.substring(5,7)];
+        date = [parseInt(date.substring(8,10)),parseInt(date.substring(5,7))];
         console.log(today + '  ' + date)
         if (date[1]<today[1] || date[0]<today[0]-7) {
             console.log('plus un mois');
@@ -56,13 +56,13 @@ app.post('/', function (req, res) {
     }
 
     function get_Restaurant (assistant) {
-        if (!assistant.data.restaurant && assistant.getArgument('city') == null) {
+        if (!assistant.data.restaurant && assistant.getArgument('restaurant') == null) {
             assistant.data.state = CHOOSE_R_STATE;
             return true;
         }
         console.log(assistant.data.restaurant);
         if (!assistant.data.restaurant || assistant.data.state == CHOOSE_R_STATE) {
-            assistant.data.restaurant = assistant.getArgument('city');
+            assistant.data.restaurant = assistant.getArgument('restaurant');
             assistant.data.state = RESERVE_STATE;
         }
         return false;
@@ -70,6 +70,11 @@ app.post('/', function (req, res) {
 
     function get_Date (assistant) {
         if (!assistant.data.date && (assistant.getArgument('datebis') == null)) {
+            if (assistant.getArgument('time')) {
+                let today = new Date();
+                assistant.data.date = today.getFullYear+'-'+today.getMonth +'-'+today.getDate;
+                return false;
+            }
             assistant.data.state = CHOOSE_D_STATE;
             return true;
         }
