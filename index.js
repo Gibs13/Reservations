@@ -18,6 +18,7 @@ const WELCOME_STATE = 'welcome';
 const CHOOSE_R_STATE = 'r';
 const CHOOSE_D_STATE = 'd';
 const CHOOSE_N_STATE = 'n';
+const CHOOSE_T_STATE = 't';
 
 
 // Function Handler
@@ -32,8 +33,8 @@ app.post('/', function (req, res) {
         console.log(date);
         let today = new Date();
         
-        today = [today.getDate(),today.getMonth()];
-        date = [date.substring(8,10),date.substring(5,7)-1];
+        today = [today.getDate(),today.getMonth()+1];
+        date = [date.substring(8,10),date.substring(5,7)];
         console.log(today + '  ' + date)
         if (date[1]<today[1] || date[0]<today[0]-7) {
             console.log('plus un mois');
@@ -66,11 +67,11 @@ app.post('/', function (req, res) {
     }
 
     function get_Date (assistant) {
-        if (assistant.getArgument('date') == null) {
+        if (assistant.getArgument('date').date == null) {
             assistant.data.state = CHOOSE_D_STATE;
             return true;
         }
-        assistant.data.date = assistant.getArgument('date');
+        assistant.data.date = assistant.getArgument('date').date;
     }
 
     function get_Name (assistant) {
@@ -93,7 +94,7 @@ app.post('/', function (req, res) {
             return;
         }*/
 
-        goodDate(assistant);
+        
         assistant.data.city = assistant.getArgument('city');
         assistant.data.restaurant 
 
@@ -121,16 +122,30 @@ app.post('/', function (req, res) {
             confirmation();
         }
         if (get_Restaurant(assistant)){
-            assistant.ask("Quel restaurant ?")
+            assistant.ask("Quel restaurant ?");
             return;
         }
         if (get_Date(assistant)){
-            assistant.ask("A quelle date ?")
+            assistant.ask("A quelle date ?");
             return;
         }
+        goodDate(assistant);
         let restaurant = assistant.data.restaurant;
         let date = assistant.data.date;
-        assistant.ask("A" + date + "au " + restaurant)
+        let time = assistant.getArgument('date').time;
+        console.log(horraires[restaurant][date])
+        
+        if (!horraires[restaurant][date]) {
+            assistant.ask("Pas ouvert ce jour-ci")
+        } else if (time != null) {
+            let hours = 'Le restaurant est ouvert :\n'
+            for (let i = 0; i<horraires[restaurant][date].length;i++) {
+            hours += 'de ' + horraires[restaurant][date][i].substring(0,2) + ' à ' + horraires[restaurant][date][i].substring(9,11) + '.\n' ;
+            }
+            assistant.data.state = CHOOSE_T_STATE;
+            assistant.ask(hours + "A quelle heure souhaitez vous vous y rendre ?");
+        }
+        assistant.ask("A " + date + "au " + restaurant);
     }
 
     function yes (assistant) {
