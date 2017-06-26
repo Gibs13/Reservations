@@ -30,7 +30,7 @@ app.post('/', function (req, res) {
 
     function goodDate(assistant) {
 
-        let date = assistant.getArgument('date').date;
+        let date = assistant.data.date;
         console.log(date);
         let today = new Date();
         
@@ -53,10 +53,6 @@ app.post('/', function (req, res) {
             assistant.data.restaurant = restaurants[Math.floor(Math.random()*restaurants.length)];
         }*/
         return array[Math.floor(Math.random()*array.length)];
-    }
-
-    function get_City (assistant) {
-
     }
 
     function get_Restaurant (assistant) {
