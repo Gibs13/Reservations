@@ -169,7 +169,7 @@ app.post('/', function (req, res) {
         let timebis = assistant.getArgument('timebis');
         let lastname = assistant.getArgument('last-name');
         let number = assistant.getArgument('number');
-        let todayNormalized= today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()+1).toString()).slice(-2);
+        let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
         
         if (lastname) {
             assistant.data.name = lastname;
