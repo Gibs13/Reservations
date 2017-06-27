@@ -4,8 +4,7 @@ process.env.DEBUG = 'actions-on-google:*';
 let ApiAiApp = require('actions-on-google').ApiAiApp;
 let express = require('express');
 let bodyParser = require('body-parser');
-let horraires = require('./horraires.js');
-let restaurants = require('./restaurants.js');
+const horaires = require('./horaires.js');
 
 let app = express();
 app.use(bodyParser.json({type: 'application/json'}));
@@ -16,10 +15,7 @@ let sprintf = require('sprintf-js').sprintf;
 
 const WELCOME_STATE = 'welcome';
 const RESERVE_STATE = 'reserve';
-const CHOOSE_R_STATE = 'r';
-const CHOOSE_D_STATE = 'd';
-const CHOOSE_N_STATE = 'n';
-const CHOOSE_T_STATE = 't';
+const CHOOSE_STATE = 'choose';
 
 
 // Function Handler
@@ -28,7 +24,7 @@ const CHOOSE_T_STATE = 't';
 app.post('/', function (req, res) {
     const assistant = new ApiAiApp({request: req, response: res});
 
-    function goodDate(assistant) {
+    /*function goodDate(assistant) {
 
         let date = assistant.data.date;
         console.log(date);
@@ -42,7 +38,7 @@ app.post('/', function (req, res) {
         } else if (date[0]<today[0]) {
             console.log('plus une semaine');
         }
-    }
+    }*/
 
     function select(array) {
         /*if (assistant.data.state == WELCOME_STATE) {
@@ -56,15 +52,17 @@ app.post('/', function (req, res) {
     }
 
     function get_Restaurant (assistant) {
-        if (!assistant.data.restaurant && assistant.getArgument('resto') == null) {
-            assistant.data.state = CHOOSE_R_STATE;
+        let resto = assistant.getArgument('resto');
+        if (!assistant.data.restaurant && resto == null) {
+            assistant.data.state = CHOOSE_STATE;
             return true;
         }
-        console.log("lel " + !undefined);
         console.log(assistant.data.restaurant);
-        if (assistant.data.restaurant == undefined || assistant.data.state == CHOOSE_R_STATE) {
-            assistant.data.restaurant = assistant.getArgument('resto');
+        if (assistant.data.restaurant == undefined || assistant.data.state == CHOOSE_STATE) {
+            assistant.data.restaurant = resto;
             assistant.data.state = RESERVE_STATE;
+        } else if (assistant.data.restaurant != undefined && resto != null) {
+            assistant.data.restaurant_ = resto;
         }
         return false;
     }
@@ -78,11 +76,11 @@ app.post('/', function (req, res) {
                 assistant.data.date = today.getFullYear().toString()+'-'+month+'-'+day;
                 return false;
             }
-            assistant.data.state = CHOOSE_D_STATE;
+            assistant.data.state = CHOOSE_STATE;
             return true;
         }
         console.log(assistant.data.date);
-        if (assistant.data.date == undefined || assistant.data.state == CHOOSE_D_STATE) {
+        if (assistant.data.date == undefined || assistant.data.state == CHOOSE_STATE) {
             assistant.data.date = assistant.getArgument('datebis');
             assistant.data.state = RESERVE_STATE;
         }
@@ -113,11 +111,36 @@ app.post('/', function (req, res) {
         assistant.ask(assistant.data.city);
     }
 
+    function disponible(horaires, time) {
+        let min;
+        let max;
+        let possibleTime = [];
+        if (isNaN(time)) {
+            console.log("Nan");
+        }
+        for (let i = 0; i<dispo.length;i++) {
+            min = parseInt(horaires[i].substring(0,2))*60 + parseInt(horaires[i].substring(3,5));
+            max = parseInt(horaires[i].substring(9,11))*60 + parseInt(horaires[i].substring(12,14));
+            
+            console.log("min : "+min+" max : "+max+" time : "+time);
+
+                if (min<=time && time<=max) {
+                    return true;
+                } else if (time<min && possibleTime[0] == undefined) {
+                    possibleTime[0] = min;
+                } else if (time>max) {
+                    possibleTime[1] = max;
+                }
+            }
+        let answer = possibleTime[1]-time < time-possibleTime[0] ? possibleTime[1] : possibleTime [0];
+        return answer;
+    }
+
     // intents
 
     function start (assistant) {
         assistant.data.state = WELCOME_STATE;
-        assistant.ask("Bienvenue, souhaitez vous reservez un restaurant ?")
+        assistant.ask("Bienvenue, souhaitez vous reserver un restaurant ?")
     }
     
     function choose (assistant) {
@@ -127,50 +150,77 @@ app.post('/', function (req, res) {
     }
 
     function reserve (assistant) {
-        if (assistant.data.state != WELCOME_STATE) {
-            confirmation();
-        }
-        if (get_Restaurant(assistant)){
-            assistant.ask("Quel restaurant ?");
-            return;
-        }
-        if (get_Date(assistant)){
-            assistant.ask("A quelle date ?");
-            return;
-        }
-        goodDate(assistant);
-        let restaurant = assistant.data.restaurant;
-        let date = assistant.data.date;
-        let time = assistant.getArgument('timebis');
-        let dispo = horraires[restaurant][date];
+
+        let today = new Date();
+        let resto = assistant.getArgument('resto');
+        let datebis = assistant.getArgument('datebis');
+        let timebis = assistant.getArgument('timebis');
         
-        console.log('horraires : ' + dispo)
+        if (timebis) {
+            assistant.data.time = timebis;
+        }
+
+        if (datebis) {
+            assistant.data.date = datebis;
+        } else if (!assistant.data.date) {
+            let month = (today.getMonth()+1) < 10 ? '0' + (today.getMonth()+1).toString() : (today.getMonth()+1).toString();
+            let day = today.getDate() < 10 ? '0' + today.getDate().toString() : today.getDate().toString();
+            assistant.data.date = today.getFullYear().toString()+'-'+month+'-'+day;
+        }
+
+        let date = assistant.data.date;
+
+        if (resto) {
+            assistant.data.restaurant = resto;
+        } else if (!assistant.data.restaurant) {
+            let rand = select(Object.keys(horaires));
+            if (horaires.rand[date] && 0 in horaires.rand[date]){
+                assistant.data.restaurant = rand;
+                assistant.data.proposition = true;
+            } else {
+                assistant.ask("Dans quel restaurant souhaiteriez vous aller ?");
+                return;
+            }
+        }
+
+        let restaurant = assistant.data.restaurant;
+        let dispo = horaires[restaurant][date];
+
+        if (assistant.data.time) {
+            let time = assistant.data.time;
+            let minutes = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
+            if (disponible(dispo,minutes)) {
+                confirmation()
+            } else {}
+        }
+
+        
+        
+        
+        
+        
+        console.log('horaires : ' + dispo)
 
         if (!dispo) {
             assistant.ask("Pas ouvert ce jour-ci")
             return;
         } else if (time == undefined) {
-            let hours = 'Le restaurant est ouvert :\n'
+            let today = new Date();
+            let minutes = today.getHours()*60 + today.getMinutes();
+            if (minutes < 720 && disponible(dispo,Math.max(minutes+45,720))) {
+                if (disponible(dispo,12)) {
+                }
+            } else if (today.getHours() < 11) {}
             for (let i = 0; i<dispo.length;i++) {
             hours += 'de ' + dispo[i].substring(0,2) + ' à ' + dispo[i].substring(9,11) + '.\n' ;
             }
-            assistant.data.state = CHOOSE_T_STATE;
-            assistant.ask(hours + "A quelle heure souhaitez vous vous y rendre ?");
+            
+            
             return;
         } else {
-            let min;
-            let max;
-            let timebis = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
-            for (let i = 0; i<dispo.length;i++) {
-            min = parseInt(dispo[i].substring(0,2))*60 + parseInt(dispo[i].substring(3,5));
-            max = parseInt(dispo[i].substring(9,11))*60 + parseInt(dispo[i].substring(12,14));
-
-            console.log("min : "+min+" max : "+max+" timebis : "+timebis);
-
-                if (min<timebis && timebis<max) {
+            if (disponible(dispo,parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5)))) {
                     assistant.ask("A " + date + " au " + restaurant);
                     return;
-                }
             }
             assistant.ask("Pas ouvert a cette heure.");
             return;
