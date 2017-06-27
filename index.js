@@ -16,6 +16,7 @@ let sprintf = require('sprintf-js').sprintf;
 const WELCOME_STATE = 'welcome';
 const RESERVE_STATE = 'reserve';
 const CHOOSE_STATE = 'choose';
+const CONFIRM_STATE = 'confirm';
 
 
 // Function Handler
@@ -87,19 +88,20 @@ app.post('/', function (req, res) {
         return false;
     }
 
-    function get_Name (assistant) {
-    }
+    function confirmation (assistant) {
 
-    function confirmation () {
+        let message = assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". ";
 
         if (assistant.data.proposition) {
-            assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger au restaurant " + assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". Etes vous d'accord ? ");
-
+            assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger au restaurant " + message + "Etes vous d'accord ? ");
+            return;
         }
         if (!assistant.data.name) {
             assistant.setContext("information");
-            assistant.ask("A quel nom dois-je reserver ? ");
-        }
+            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":"") + message + "A quel nom dois-je reserver ? ");
+            assistant.data.state = CONFIRM_STATE;
+            return;
+        } 
 
     }
 
@@ -151,7 +153,7 @@ app.post('/', function (req, res) {
 
     function start (assistant) {
         assistant.data.state = WELCOME_STATE;
-        assistant.ask("Bienvenue, souhaitez vous reserver un restaurant ?")
+        assistant.ask("Bienvenue, souhaitez vous reserver un restaurant ?");
     }
     
     function choose (assistant) {
@@ -174,7 +176,7 @@ app.post('/', function (req, res) {
         
         if (lastname) {
             assistant.data.name = lastname;
-        }
+        }        
 
         if (number) {
             assistant.data.places = number;
@@ -218,6 +220,12 @@ app.post('/', function (req, res) {
         restaurant = restaurant.toUpperCase();
         console.log(restaurant);
         let dispo = horaires[restaurant][date];
+
+        if (!assistant.data.places) {
+            assistant.ask("Combien serez-vous ? ");
+            assistant.setContext("asknumber");
+            return;
+        }
 
         if (true) {
             let time = assistant.data.time;
