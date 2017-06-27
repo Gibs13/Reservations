@@ -222,6 +222,7 @@ app.post('/', function (req, res) {
             } else if (T === false) {
                 //Pas de place ce jour
                 assistant.data.message += "Il n'y a pas de place ce jour-çi. ";
+                confirmation(assistant);
             } else {
                 //Pas de place à cette heure mais à une autre heure le même jour
                 assistant.data.proposition = true;
