@@ -214,7 +214,7 @@ app.post('/', function (req, res) {
         }
 
         let restaurant = assistant.data.restaurant;
-        restaurant.toUpperCase();
+        restaurant = restaurant.toUpperCase();
         console.log(restaurant);
         let dispo = horaires[restaurant][date];
 
