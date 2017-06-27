@@ -118,13 +118,17 @@ app.post('/', function (req, res) {
     }
 
     function reserver (assistant) {
-        let placeRestante = parseInt(horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau].substring(18));
+        let restaurant = assistant.data.restaurant;
+        let date = assistant.data.date;
+        let creneau = assistant.data.creneau;
+        console.log(restaurant + " " + date + " " + creneau);
+        let placeRestante = parseInt(horaires[restaurant][assistant.data.date][assistant.data.creneau].substring(18));
         let places = assistant.data.places;
-        console.log("reservation à " + horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau]);
+        console.log("reservation à " + horaires[restaurant][date][creneau]);
         if (placeRestante-places>=0) {
             console.log("valide");
-            horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau] = horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau].substring(0,18) + (placeRestante-places).toString();
-            console.log(horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau]);
+            horaires[restaurant][date][creneau] = horaires[restaurant][date][creneau].substring(0,18) + (placeRestante-places).toString();
+            console.log(horaires[restaurant][date][creneau]);
             assistant.tell("Votre table à été reservée avec succès au nom de " + assistant.data.name);
         } else {
             console.log("invalide");
@@ -228,7 +232,7 @@ app.post('/', function (req, res) {
 
 
         if (resto) {
-            assistant.data.restaurant = resto;
+            assistant.data.restaurant = resto.toUpperCase();
         } else if (!assistant.data.restaurant) {
             let rand = select(Object.keys(horaires));
             console.log("random restaurant selected : " +rand);
@@ -242,7 +246,6 @@ app.post('/', function (req, res) {
         }
 
         let restaurant = assistant.data.restaurant;
-        restaurant = restaurant.toUpperCase();
         console.log(restaurant);
         let dispo = horaires[restaurant][date];
 
