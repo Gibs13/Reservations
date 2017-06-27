@@ -148,7 +148,8 @@ app.post('/', function (req, res) {
                     possibleTime[1] = max;
                 }
             }
-        let answer = possibleTime[1]-time < time-possibleTime[0] ? possibleTime[1] : possibleTime [0];
+        let rightTime = possibleTime[1]-time < time-possibleTime[0] ? parseInt(possibleTime[1]) : parseInt(possibleTime [0]);
+        let answer = (0 + (rightTime/60).toString()).substring(-2) + ':' (0 + (rightTime-(rightTime/60)*60).toString()).substring(-2);
         return answer;
     }
 
@@ -249,6 +250,7 @@ app.post('/', function (req, res) {
                 //Pas de place à cette heure mais à une autre heure le même jour
                 console.log("Une place à une autre heure");
                 assistant.data.proposition = true;
+                assistant.data.time = T;
                 assistant.data.message += "Il n'y a pas de place à cette heure là. ";
                 confirmation(assistant);
             }
