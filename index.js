@@ -101,8 +101,8 @@ app.post('/', function (req, res) {
         }
         if (!assistant.data.name) {
             assistant.setContext("information");
-            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "A quel nom dois-je reserver ? ");
             assistant.data.state = CONFIRM_STATE;
+            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "A quel nom dois-je reserver ? ");
             return;
         }
         if (assistant.data.state == CONFIRM_STATE) {
