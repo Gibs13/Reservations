@@ -127,7 +127,8 @@ app.post('/', function (req, res) {
         if (isNaN(time)) {
             console.log("Nan");
         }
-        if (horaires == undefined && horaires.length == 0) {return false;}
+        if (horaires == undefined) {return false;}
+        if (horaires.length == 0) {return false;}
         for (let i = 0; i<horaires.length;i++) {
             min = parseInt(horaires[i].substring(0,2))*60 + parseInt(horaires[i].substring(3,5));
             max = parseInt(horaires[i].substring(9,11))*60 + parseInt(horaires[i].substring(12,14));
