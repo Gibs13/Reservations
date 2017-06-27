@@ -4,7 +4,7 @@ process.env.DEBUG = 'actions-on-google:*';
 let ApiAiApp = require('actions-on-google').ApiAiApp;
 let express = require('express');
 let bodyParser = require('body-parser');
-const horaires = require('./horaires.js');
+let horaires = require('./horaires.js');
 
 let app = express();
 app.use(bodyParser.json({type: 'application/json'}));
@@ -106,56 +106,68 @@ app.post('/', function (req, res) {
             return;
         }
         if (assistant.data.state == CONFIRM_STATE) {
-            assistant.tell("Votre table à été reservée avec succès au nom de " + assistant.data.name)
+            reserver(assistant);
+            return;
         } else {
             assistant.data.state = CONFIRM_STATE;
             assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "Dois-je finaliser la réservation ?");
+            return;
         }        
         
 
     }
 
     function reserver (assistant) {
-
-        /*if (assistant.data.state != RESERVE_STATE && assistant.data.state != WELCOME_STATE) {
-            assistant.ask("are you sure ?");
-            return;
-        }*/
-
-        
-        assistant.data.city = assistant.getArgument('city');
-        assistant.data.restaurant 
-
-
-
-
-        assistant.ask(assistant.data.city);
+        let placeRestante = parseInt(horaires[assistant.data.date][assistant.data.creneau].substring(18));
+        let places = assistant.data.places;
+        console.log("reservation à " + horaires);
+        if (placeRestante-places>=0) {
+            console.log("valide");
+            horaires[assistant.data.date][assistant.data.creneau] = horaires[assistant.data.date][assistant.data.creneau].substring(0,18) + (placeRestante-places).toString();
+            console.log(horaires[assistant.data.date][assistant.data.creneau]);
+            assistant.tell("Votre table à été reservée avec succès au nom de " + assistant.data.name);
+        } else {
+            console.log("invalide");
+            assistant.ask("Il y a eu un problème, le nombre de place n'est plus bon.");
+        }
+    
     }
 
-    function disponible(horaires, time) {
+    function disponible(horairesJour, time) {
         let min;
         let max;
         let possibleTime = [];
+        let placeRestante;
         if (isNaN(time)) {
             console.log("Nan");
         }
-        if (horaires == undefined) {return false;}
-        if (horaires.length == 0) {return false;}
-        for (let i = 0; i<horaires.length;i++) {
-            min = parseInt(horaires[i].substring(0,2))*60 + parseInt(horaires[i].substring(3,5));
-            max = parseInt(horaires[i].substring(9,11))*60 + parseInt(horaires[i].substring(12,14));
+        if (horairesJour == undefined) {return false;}
+        if (horairesJour.length == 0) {return false;}
+        for (let i = 0; i<horairesJour.length;i++) {
+            placeRestante = parseInt(horairesJour[i].substring(18));
+            min = parseInt(horairesJour[i].substring(0,2))*60 + parseInt(horairesJour[i].substring(3,5));
+            max = parseInt(horairesJour[i].substring(9,11))*60 + parseInt(horairesJour[i].substring(12,14));
             
             console.log("min : "+min+" max : "+max+" time : "+time);
 
-                if (min<=time && time<=max) {
-                    return true;
-                } else if (time<min && possibleTime[0] == undefined) {
+            if (min<=time && time<=max && placeRestante >= assistant.data.places) {
+                assistant.data.creneau = i;
+                return true;
+            } else if (placeRestante >= assistant.data.places) {
+                if (time<min) {
                     possibleTime[0] = min;
-                } else if (time>max) {
+                    possibleTime[2] = i;
+                } else if (time>max && possibleTime[1] == undefined) {
                     possibleTime[1] = max;
+                    possibleTime[3] = i;
                 }
             }
-        let rightTime = possibleTime[1]-time < time-possibleTime[0] ? parseInt(possibleTime[1]) : parseInt(possibleTime [0]);
+        }
+        if (possibleTime == []) {
+            return false;
+        }
+        let rightTime = possibleTime[1]-time <= time-possibleTime[0] ? parseInt(possibleTime[1]) : parseInt(possibleTime [0]);
+        assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
         let answer = (0 + (rightTime/60).toString()).substring(-2) + ':' (0 + (rightTime-(rightTime/60)*60).toString()).substring(-2);
         return answer;
     }
@@ -191,8 +203,8 @@ app.post('/', function (req, res) {
             assistant.data.name = lastname;
         }        
 
-        if (number || number) {
-            assistant.data.places = number;
+        if (number) {
+            assistant.data.places = parseInt(number);
         }
 
         if (datebis) {
