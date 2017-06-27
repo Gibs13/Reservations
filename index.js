@@ -91,7 +91,10 @@ app.post('/', function (req, res) {
     function confirmation (assistant) {
 
         let message = assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". ";
-
+        if (assistant.data.problem != false) {
+            assistant.ask(assistant.data.problem);
+            return;
+        }
         if (assistant.data.proposition) {
             assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger au restaurant " + message + "Etes vous d'accord ? ");
             return;
@@ -167,6 +170,7 @@ app.post('/', function (req, res) {
         assistant.setContext("asknumber",0)
         assistant.data.proposition = false;
         assistant.data.message = "";
+        assistant.data.problem = false;
         let today = new Date();
         let resto = assistant.getArgument('resto');
         let datebis = assistant.getArgument('datebis');
@@ -179,7 +183,7 @@ app.post('/', function (req, res) {
             assistant.data.name = lastname;
         }        
 
-        if (number) {
+        if (number || number) {
             assistant.data.places = number;
         }
 
@@ -239,7 +243,7 @@ app.post('/', function (req, res) {
             } else if (T === false) {
                 //Pas de place ce jour
                 console.log("Pas de place ce jour");
-                assistant.data.message += "Il n'y a pas de place ce jour-çi. ";
+                assistant.data.problem = "Il n'y a pas de place ce jour-çi. ";
                 confirmation(assistant);
             } else {
                 //Pas de place à cette heure mais à une autre heure le même jour
