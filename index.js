@@ -169,7 +169,7 @@ app.post('/', function (req, res) {
         let timebis = assistant.getArgument('timebis');
         let lastname = assistant.getArgument('last-name');
         let number = assistant.getArgument('number');
-
+        let todayNormalized= today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()+1).toString()).slice(-2);
         
         if (lastname) {
             assistant.data.name = lastname;
@@ -178,20 +178,26 @@ app.post('/', function (req, res) {
         if (number) {
             assistant.data.places = number;
         }
-        
-        if (timebis) {
-            assistant.data.time = timebis;
-        }
 
         if (datebis) {
             assistant.data.date = datebis;
         } else if (!assistant.data.date) {
-            let month = (today.getMonth()+1) < 10 ? '0' + (today.getMonth()+1).toString() : (today.getMonth()+1).toString();
-            let day = today.getDate() < 10 ? '0' + today.getDate().toString() : today.getDate().toString();
-            assistant.data.date = today.getFullYear().toString()+'-'+month+'-'+day;
+            assistant.data.date = todayNormalized;
+        }
+        
+        let date = assistant.data.date;
+        
+        if (timebis) {
+            assistant.data.time = timebis;
+        } else if (!assistant.data.time) {
+            assistant.data.proposition = true;
+            if (date == todayNormalized) {
+                assistant.data.time = ('0' + today.getHours().toString()).slice(-2) + ":" + ('0' + today.getMinutes().toString()).slice(-2);
+            } else {
+                assistant.data.time = "12:30";
+            }
         }
 
-        let date = assistant.data.date;
 
         if (resto) {
             assistant.data.restaurant = resto;
@@ -212,7 +218,7 @@ app.post('/', function (req, res) {
         console.log(restaurant);
         let dispo = horaires[restaurant][date];
 
-        if (assistant.data.time) {
+        if (true) {
             let time = assistant.data.time;
             let minutes = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
             let T = disponible(dispo,minutes);
@@ -226,7 +232,7 @@ app.post('/', function (req, res) {
             } else {
                 //Pas de place à cette heure mais à une autre heure le même jour
                 assistant.data.proposition = true;
-                assistant.data.message += "Il n'y a pas de place ce à cette heure là. ";
+                assistant.data.message += "Il n'y a pas de place à cette heure là. ";
                 confirmation(assistant);
             }
         }
