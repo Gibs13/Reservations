@@ -198,7 +198,7 @@ app.post('/', function (req, res) {
         } else if (!assistant.data.restaurant) {
             let rand = select(Object.keys(horaires));
             console.log("random restaurant selected : " +rand);
-            if (horaires.rand[date] && 0 in horaires.rand[date]){
+            if (horaires[rand][date] && 0 in horaires[rand][date]){
                 assistant.data.restaurant = rand;
                 assistant.data.proposition = true;
             } else {
