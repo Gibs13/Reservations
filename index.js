@@ -222,8 +222,8 @@ app.post('/', function (req, res) {
         let dispo = horaires[restaurant][date];
 
         if (!assistant.data.places) {
+            assistant.setContext("asknumber",5);
             assistant.ask("Combien serez-vous ? ");
-            assistant.setContext("asknumber");
             return;
         }
 
