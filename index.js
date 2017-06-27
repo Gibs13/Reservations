@@ -104,7 +104,14 @@ app.post('/', function (req, res) {
             assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "A quel nom dois-je reserver ? ");
             assistant.data.state = CONFIRM_STATE;
             return;
-        } 
+        }
+        if (assistant.data.state == CONFIRM_STATE) {
+            assistant.tell("Votre table à été reservée avec succès au nom de " + assistant.data.name)
+        } else {
+            assistant.data.state = CONFIRM_STATE;
+            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "Dois-je finaliser la réservation ?");
+        }        
+        
 
     }
 
@@ -316,6 +323,7 @@ app.post('/', function (req, res) {
 
     actionMap.set('reserve', reserve);
     actionMap.set('quit', quit);
+    actionMap.set('confirmation', confirmation);
 
     assistant.handleRequest(actionMap);
 });
