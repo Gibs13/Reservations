@@ -118,13 +118,13 @@ app.post('/', function (req, res) {
     }
 
     function reserver (assistant) {
-        let placeRestante = parseInt(horaires[assistant.data.date][assistant.data.creneau].substring(18));
+        let placeRestante = parseInt(horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau].substring(18));
         let places = assistant.data.places;
-        console.log("reservation à " + horaires);
+        console.log("reservation à " + horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau]);
         if (placeRestante-places>=0) {
             console.log("valide");
-            horaires[assistant.data.date][assistant.data.creneau] = horaires[assistant.data.date][assistant.data.creneau].substring(0,18) + (placeRestante-places).toString();
-            console.log(horaires[assistant.data.date][assistant.data.creneau]);
+            horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau] = horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau].substring(0,18) + (placeRestante-places).toString();
+            console.log(horaires[assistant.data.restaurant][assistant.data.date][assistant.data.creneau]);
             assistant.tell("Votre table à été reservée avec succès au nom de " + assistant.data.name);
         } else {
             console.log("invalide");
