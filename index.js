@@ -92,6 +92,15 @@ app.post('/', function (req, res) {
 
     function confirmation () {
 
+        if (assistant.data.proposition) {
+            assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger au restaurant " + assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". Etes vous d'accord ? ");
+
+        }
+        if (!assistant.data.name) {
+            assistant.setContext("information");
+            assistant.ask("A quel nom dois-je reserver ? ");
+        }
+
     }
 
     function reserver (assistant) {
@@ -118,6 +127,7 @@ app.post('/', function (req, res) {
         if (isNaN(time)) {
             console.log("Nan");
         }
+        if (dispo.length == 0) {return false;}
         for (let i = 0; i<dispo.length;i++) {
             min = parseInt(horaires[i].substring(0,2))*60 + parseInt(horaires[i].substring(3,5));
             max = parseInt(horaires[i].substring(9,11))*60 + parseInt(horaires[i].substring(12,14));
@@ -151,10 +161,23 @@ app.post('/', function (req, res) {
 
     function reserve (assistant) {
 
+        assistant.data.proposition = false;
+        assistant.data.message = "";
         let today = new Date();
         let resto = assistant.getArgument('resto');
         let datebis = assistant.getArgument('datebis');
         let timebis = assistant.getArgument('timebis');
+        let lastname = assistant.getArgument('last-name');
+        let number = assistant.getArgument('number');
+
+        
+        if (lastname) {
+            assistant.data.name = lastname;
+        }
+
+        if (number) {
+            assistant.data.places = number;
+        }
         
         if (timebis) {
             assistant.data.time = timebis;
@@ -174,32 +197,44 @@ app.post('/', function (req, res) {
             assistant.data.restaurant = resto;
         } else if (!assistant.data.restaurant) {
             let rand = select(Object.keys(horaires));
+            console.log("random restaurant selected : " +rand);
             if (horaires.rand[date] && 0 in horaires.rand[date]){
                 assistant.data.restaurant = rand;
                 assistant.data.proposition = true;
             } else {
-                assistant.ask("Dans quel restaurant souhaiteriez vous aller ?");
+                assistant.ask("Dans quel restaurant souhaiteriez vous aller ? ");
                 return;
             }
         }
 
         let restaurant = assistant.data.restaurant;
+        restaurant.toUpperCase();
+        console.log(restaurant);
         let dispo = horaires[restaurant][date];
 
         if (assistant.data.time) {
             let time = assistant.data.time;
             let minutes = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
-            if (disponible(dispo,minutes)) {
-                confirmation()
-            } else {}
+            let T = disponible(dispo,minutes);
+            if (T === true) {
+                //Tout est bon
+                confirmation(assistant);
+            } else if (T === false) {
+                //Pas de place ce jour
+                assistant.data.message += "Il n'y a pas de place ce jour-çi. ";
+            } else {
+                //Pas de place à cette heure mais à une autre heure le même jour
+                assistant.data.proposition = true;
+                assistant.data.message += "Il n'y a pas de place ce à cette heure là. ";
+                confirmation(assistant);
+            }
         }
 
         
         
         
         
-        
-        console.log('horaires : ' + dispo)
+    /*console.log('horaires : ' + dispo)
 
         if (!dispo) {
             assistant.ask("Pas ouvert ce jour-ci")
@@ -224,7 +259,9 @@ app.post('/', function (req, res) {
             }
             assistant.ask("Pas ouvert a cette heure.");
             return;
-        }
+            }
+    */
+    
     }
 
     function yes (assistant) {
