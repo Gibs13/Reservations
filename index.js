@@ -164,6 +164,7 @@ app.post('/', function (req, res) {
 
     function reserve (assistant) {
 
+        assistant.setContext("asknumber",0)
         assistant.data.proposition = false;
         assistant.data.message = "";
         let today = new Date();
@@ -233,13 +234,16 @@ app.post('/', function (req, res) {
             let T = disponible(dispo,minutes);
             if (T === true) {
                 //Tout est bon
+                console.log("tout est bon");
                 confirmation(assistant);
             } else if (T === false) {
                 //Pas de place ce jour
+                console.log("Pas de place ce jour");
                 assistant.data.message += "Il n'y a pas de place ce jour-çi. ";
                 confirmation(assistant);
             } else {
                 //Pas de place à cette heure mais à une autre heure le même jour
+                console.log("Une place à une autre heure");
                 assistant.data.proposition = true;
                 assistant.data.message += "Il n'y a pas de place à cette heure là. ";
                 confirmation(assistant);
