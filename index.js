@@ -90,18 +90,18 @@ app.post('/', function (req, res) {
 
     function confirmation (assistant) {
 
-        let message = assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". ";
+        let message = "au restaurant " + assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". ";
         if (assistant.data.problem != false) {
             assistant.ask(assistant.data.problem);
             return;
         }
         if (assistant.data.proposition) {
-            assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger au restaurant " + message + "Etes vous d'accord ? ");
+            assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger " + message + "Etes vous d'accord ? ");
             return;
         }
         if (!assistant.data.name) {
             assistant.setContext("information");
-            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":"") + message + "A quel nom dois-je reserver ? ");
+            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "A quel nom dois-je reserver ? ");
             assistant.data.state = CONFIRM_STATE;
             return;
         } 
