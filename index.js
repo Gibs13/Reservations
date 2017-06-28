@@ -17,6 +17,8 @@ const WELCOME_STATE = 'welcome';
 const RESERVE_STATE = 'reserve';
 const CHOOSE_STATE = 'choose';
 const CONFIRM_STATE = 'confirm';
+const YES_NO_STATE = 'yes_no';
+const GIVE_NAME_STATE = 'give_name';
 
 
 // Function Handler
@@ -40,6 +42,10 @@ app.post('/', function (req, res) {
             console.log('plus une semaine');
         }
     }*/
+
+    function createDateMessage(assistant) {
+
+    }
 
     function select(array) {
         /*if (assistant.data.state == WELCOME_STATE) {
@@ -90,6 +96,7 @@ app.post('/', function (req, res) {
 
     function confirmation (assistant) {
 
+        createDateMessage(assistant);
         let message = "au restaurant " + assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". ";
         if (assistant.data.problem != false) {
             assistant.ask(assistant.data.problem);
@@ -97,19 +104,24 @@ app.post('/', function (req, res) {
         }
         if (assistant.data.proposition) {
             assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger " + message + "Etes vous d'accord ? ");
+            assistant.data.state = YES_NO_STATE;
             return;
         }
         if (!assistant.data.name) {
             assistant.setContext("information");
-            assistant.data.state = CONFIRM_STATE;
+            if (assistant.data.state == GIVE_NAME_STATE) {
+                assistant.ask("Je n'ai pas compris votre nom. ");
+                return;
+            }
+            assistant.data.state = GIVE_NAME_STATE;
             assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "A quel nom dois-je reserver ? ");
             return;
         }
-        if (assistant.data.state == CONFIRM_STATE) {
+        if (assistant.data.state == CONFIRM_STATE || assistant.data.state == GIVE_NAME_STATE) {
             reserver(assistant);
             return;
         } else {
-            assistant.data.state = CONFIRM_STATE;
+            assistant.data.state = YES_NO_STATE;
             assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "Dois-je finaliser la réservation ?");
             return;
         }        
@@ -284,44 +296,17 @@ app.post('/', function (req, res) {
                 confirmation(assistant);
             }
         }
-
-        
-        
-        
-        
-    /*console.log('horaires : ' + dispo)
-
-        if (!dispo) {
-            assistant.ask("Pas ouvert ce jour-ci")
-            return;
-        } else if (time == undefined) {
-            let today = new Date();
-            let minutes = today.getHours()*60 + today.getMinutes();
-            if (minutes < 720 && disponible(dispo,Math.max(minutes+45,720))) {
-                if (disponible(dispo,12)) {
-                }
-            } else if (today.getHours() < 11) {}
-            for (let i = 0; i<dispo.length;i++) {
-            hours += 'de ' + dispo[i].substring(0,2) + ' à ' + dispo[i].substring(9,11) + '.\n' ;
-            }
-            
-            
-            return;
-        } else {
-            if (disponible(dispo,parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5)))) {
-                    assistant.ask("A " + date + " au " + restaurant);
-                    return;
-            }
-            assistant.ask("Pas ouvert a cette heure.");
-            return;
-            }
-    */
-    
     }
 
     function yes (assistant) {
         if (assistant.data.state == WELCOME_STATE) {
-            reserve();
+            assistant.data.state = RESERVE_STATE;
+            assistant.ask("Dans quel restaurant souhaiteriez vous aller ? ")
+            return;
+        }
+        if (assistant.data.state == YES_NO_STATE) {
+            assistant.data.state = CONFIRM_STATE;
+            confirmation(assistant);
         }
 
     }
@@ -329,6 +314,11 @@ app.post('/', function (req, res) {
     function no (assistant) {
         if (assistant.data.state == WELCOME_STATE) {
             quit(assistant);
+            return;
+        }
+        if (assistant.data.state == YES_NO_STATE) {
+            assistant.data.state = CHOOSE_STATE;
+            assistant.ask("What should I change ? ");
             return;
         }
 
@@ -346,6 +336,9 @@ app.post('/', function (req, res) {
     actionMap.set('reserve', reserve);
     actionMap.set('quit', quit);
     actionMap.set('confirmation', confirmation);
+    actionMap.set('yes', yes);
+    actionMap.set('no', no);
+    
 
     assistant.handleRequest(actionMap);
 });
