@@ -170,8 +170,11 @@ app.post('/', function (req, res) {
         if (possibleTime == []) {
             return false;
         }
-        let rightTime = possibleTime[1]-time <= time-possibleTime[0] ? parseInt(possibleTime[1]) : parseInt(possibleTime [0]);
+        console.log(possibleTime)
+        let rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
+        console.log("right time : " + rightTime);
         assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
+        console.log("creneau : " + assistant.data.creneau);
         let answer = (0 + (rightTime/60).toString()).substring(-2) + ':' + (0 + (rightTime-(rightTime/60)*60).toString()).substring(-2);
         console.log("temps proposé : " + answer);
         return answer;
