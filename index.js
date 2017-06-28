@@ -22,7 +22,7 @@ const GIVE_NAME_STATE = 'give_name';
 const CHANGE_STATE= "change";
 
 const PROPOSITION = ["My suggestion is ","I may suggest you ","A possible choice would be ","I allowed myself to choose ","Maybe "];
-const ASK_NAME = ["Under what name should I reserve ? ","What's your last name ? ","Wh"];
+const ASK_NAME = ["Under what name should I reserve ? ","What's your last name ? ","At what name may i order ? "];
 const MISUNDERSTAND = ["Sorry, I didn't understand. ","What did you just said ? ","I didn't heared well. "];
 const AGREE = ["Do you agree ? ","Is it ok for you ? ","Is it alright ? "];
 const FINISH = ["May I place an order ? ","Is everything right ? ",];
@@ -33,7 +33,10 @@ const WHICH_RESTAURANT = ["In which restaurant do you want to go ? "];
 const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. "];
 const BYE = ["Alright then, come back soon ! "];
 const CHANGE = ["What should I change ? "];
-const NOROOM = ["There is no room ","They haven't got any seats "]
+const NOROOM = ["There is no room ","They haven't got any seats "];
+
+const MONTH = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAY = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
 
 
 // Function Handler
@@ -41,6 +44,7 @@ const NOROOM = ["There is no room ","They haven't got any seats "]
 
 app.post('/', function (req, res) {
     const assistant = new ApiAiApp({request: req, response: res});
+    let today = new Date();
 
     /*function goodDate(assistant) {
 
@@ -64,6 +68,13 @@ app.post('/', function (req, res) {
     }
 
     function createDateMessage(assistant) {
+        let date = assistant.data.date;
+        let month = date.substring(5,7);
+        let day = date.substring(8,10);
+        let todayMonth = today.getMonth();
+        let todayDay = today.getDate();
+        let message = "";
+
 
     }
 
@@ -97,7 +108,6 @@ app.post('/', function (req, res) {
     function get_Date (assistant) {
         if (!assistant.data.date && (assistant.getArgument('datebis') == null)) {
             if (assistant.getArgument('timebis')) {
-                let today = new Date();
                 let month = (today.getMonth()+1) < 10 ? '0' + (today.getMonth()+1).toString() : (today.getMonth()+1).toString();
                 let day = today.getDate() < 10 ? '0' + today.getDate().toString() : today.getDate().toString();
                 assistant.data.date = today.getFullYear().toString()+'-'+month+'-'+day;
@@ -244,7 +254,7 @@ app.post('/', function (req, res) {
         assistant.data.proposition = false;
         assistant.data.message = "";
         assistant.data.problem = false;
-        let today = new Date();
+        assistant.data.state = RESERVE_STATE;
         let resto = assistant.getArgument('resto');
         let datebis = assistant.getArgument('datebis');
         let timebis = assistant.getArgument('timebis');
