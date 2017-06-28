@@ -178,7 +178,7 @@ app.post('/', function (req, res) {
             rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
         }
         assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
-        let answer = (0 + (rightTime/60).toString()).substring(-2) + ':' + (0 + (rightTime-(rightTime/60)*60).toString()).substring(-2);
+        let answer = ('0' + (rightTime/60).toString()).substring(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).substring(-2);
         console.log("temps proposé : " + answer);
         return answer;
     }
