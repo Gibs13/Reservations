@@ -20,6 +20,19 @@ const CONFIRM_STATE = 'confirm';
 const YES_NO_STATE = 'yes_no';
 const GIVE_NAME_STATE = 'give_name';
 
+const PROPOSITION = ["My suggestion is "];
+const ASK_NAME = ["Under what name should I reserve ? "];
+const MISUNDERSTAND = ["I didn't understand. "];
+const AGREE = ["Do you agree ? "];
+const FINISH = ["May I place an order ? "];
+const READY = ["A table is available "];
+const SUCCESS = ["Your reservation was completed "];
+const HOWMANY = ["How many person are coming ? "];
+const WHICH_RESTAURANT = ["In which restaurant do you want to go ? "];
+const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. "];
+const BYE = ["Alright then, come back soon ! "];
+const CHANGE = ["What should I change ? "];
+
 
 // Function Handler
 
@@ -42,6 +55,11 @@ app.post('/', function (req, res) {
             console.log('plus une semaine');
         }
     }*/
+
+    function R (assistant, array) {
+        let prompt = array[Math.floor(Math.random() * (array.length))];
+        return prompt;
+    }
 
     function createDateMessage(assistant) {
 
