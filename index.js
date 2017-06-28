@@ -22,14 +22,11 @@ const GIVE_NAME_STATE = 'give_name';
 const CHANGE_STATE= "change";
 
 const PROPOSITION = ["My suggestion is ","I may suggest you ","A possible choice would be ","I allowed myself to choose ","Maybe "];
-const ASK_NAME = ["Under what name should I reserve ? ","What's your last name ? ","At what name may i order ? "];
 const MISUNDERSTAND = ["Sorry, I didn't understand. ","What did you just said ? ","I didn't heared well. "];
 const AGREE = ["Do you agree ? ","Is it ok for you ? ","Is it alright ? "];
 const FINISH = ["May I place an order ? ","Is everything right ? ",];
 const READY = ["A table is available "];
 const SUCCESS = ["Your reservation was completed "];
-const HOWMANY = ["How many person are coming ? "];
-const WHICH_RESTAURANT = ["In which restaurant do you want to go ? "];
 const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. "];
 const BYE = ["Alright then, come back soon ! "];
 const CHANGE = ["What should I change ? "];
@@ -89,41 +86,6 @@ app.post('/', function (req, res) {
         return array[Math.floor(Math.random()*array.length)];
     }
 
-    function get_Restaurant (assistant) {
-        let resto = assistant.getArgument('resto');
-        if (!assistant.data.restaurant && resto == null) {
-            assistant.data.state = CHOOSE_STATE;
-            return true;
-        }
-        console.log(assistant.data.restaurant);
-        if (assistant.data.restaurant == undefined || assistant.data.state == CHOOSE_STATE) {
-            assistant.data.restaurant = resto;
-            assistant.data.state = RESERVE_STATE;
-        } else if (assistant.data.restaurant != undefined && resto != null) {
-            assistant.data.restaurant_ = resto;
-        }
-        return false;
-    }
-
-    function get_Date (assistant) {
-        if (!assistant.data.date && (assistant.getArgument('datebis') == null)) {
-            if (assistant.getArgument('timebis')) {
-                let month = (today.getMonth()+1) < 10 ? '0' + (today.getMonth()+1).toString() : (today.getMonth()+1).toString();
-                let day = today.getDate() < 10 ? '0' + today.getDate().toString() : today.getDate().toString();
-                assistant.data.date = today.getFullYear().toString()+'-'+month+'-'+day;
-                return false;
-            }
-            assistant.data.state = CHOOSE_STATE;
-            return true;
-        }
-        console.log(assistant.data.date);
-        if (assistant.data.date == undefined || assistant.data.state == CHOOSE_STATE) {
-            assistant.data.date = assistant.getArgument('datebis');
-            assistant.data.state = RESERVE_STATE;
-        }
-        return false;
-    }
-
     function confirmation (assistant) {
 
         createDateMessage(assistant);
@@ -131,6 +93,22 @@ app.post('/', function (req, res) {
         if (assistant.data.problem != false) {
             assistant.ask(assistant.data.problem);
             return;
+        }
+        let time = assistant.data.time;
+        let minutes = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
+        let T = disponible(dispo,minutes);
+        if (T === true) {
+             //Tout est bon
+            console.log("tout est bon");
+        } else if (T === false) {
+            //Pas de place ce jour
+            console.log("Pas de place ce jour");
+        } else {
+            //Pas de place à cette heure mais à une autre heure le même jour
+            console.log("Une place à une autre heure");
+            assistant.data.proposition = true;
+            assistant.data.time = T;
+            assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
         }
         if (assistant.data.proposition) {
             assistant.data.state = YES_NO_STATE;
@@ -261,24 +239,21 @@ app.post('/', function (req, res) {
         let lastname = assistant.getArgument('last-name');
         let number = assistant.getArgument('number');
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
-        
-        if (lastname) {
-            assistant.data.name = lastname;
-        }        
 
-        if (number) {
-            assistant.data.places = parseInt(number);
-        }
+        assistant.data.places = parseInt(number);
 
-        if (datebis) { 
-            if (parseInt(datebis) == NaN) {
-                assistant.data.problem(R(assistant,MISUNDERSTAND) + "What was the date ? ")
+        if (isNaN(assistant.data.places)) {
+                assistant.setContext(CHOOSE_STATE);
+                assistant.data.problem == "I didn't understood the number. "
             }
-            assistant.data.date = datebis;
-        } else if (!assistant.data.date) {
+
+        if (datebis == "today") {
             assistant.data.date = todayNormalized;
+        } else if (parseInt(datebis) == NaN) {
+            assistant.data.problem == "What was the date ? ";
+        } else {
+        assistant.data.date = datebis;
         }
-        
         let date = assistant.data.date;
         
         if (timebis) {
@@ -312,10 +287,12 @@ app.post('/', function (req, res) {
         let dispo = horaires[restaurant][date];
 
         if (!assistant.data.places) {
-            assistant.setContext("asknumber",5);
+            assistant.setContext("asknumber");
             assistant.ask(R(assistant, HOWMANY) );
             return;
         }
+
+        confirmation(assistant);
 
         if (true) {
             let time = assistant.data.time;
@@ -336,7 +313,7 @@ app.post('/', function (req, res) {
                 assistant.data.proposition = true;
                 assistant.data.time = T;
                 assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
-                confirmation(assistant);
+                
             }
         }
     }
@@ -344,7 +321,7 @@ app.post('/', function (req, res) {
     function yes (assistant) {
         if (assistant.data.state == WELCOME_STATE) {
             assistant.data.state = RESERVE_STATE;
-            assistant.ask(R(assistant, WHICH_RESTAURANT))
+            assistant.ask("Choose your restaurant.")
             return;
         }
         if (assistant.data.state == YES_NO_STATE) {
