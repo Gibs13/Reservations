@@ -190,7 +190,7 @@ app.post('/', function (req, res) {
             rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
         }
         assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
-        let answer = ('0' + (rightTime/60).toString()).substr(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).substr(-2);
+        let answer = ('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2);
         console.log("temps proposé : " + answer);
         return answer;
     }
@@ -243,7 +243,7 @@ app.post('/', function (req, res) {
         } else if (!assistant.data.time) {
             assistant.data.proposition = true;
             if (date == todayNormalized) {
-                assistant.data.time = ('0' + today.getHours().toString()).slice(-2) + ":" + ('0' + today.getMinutes().toString()).slice(-2);
+                assistant.data.time = ('0' + (today.getHours()+3).toString()).slice(-2) + ":" + ('0' + today.getMinutes().toString()).slice(-2);
             } else {
                 assistant.data.time = "12:30";
             }
@@ -338,7 +338,7 @@ app.post('/', function (req, res) {
     actionMap.set('confirmation', confirmation);
     actionMap.set('yes', yes);
     actionMap.set('no', no);
-    
+
 
     assistant.handleRequest(actionMap);
 });
