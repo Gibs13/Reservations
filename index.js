@@ -352,6 +352,7 @@ app.post('/', function (req, res) {
 
     let actionMap = new Map();
 
+    actionMap.set('start', start);
     actionMap.set('reserve', reserve);
     actionMap.set('quit', quit);
     actionMap.set('confirmation', confirmation);
