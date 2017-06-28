@@ -19,12 +19,13 @@ const CHOOSE_STATE = 'choose';
 const CONFIRM_STATE = 'confirm';
 const YES_NO_STATE = 'yes_no';
 const GIVE_NAME_STATE = 'give_name';
+const CHANGE_STATE= "change";
 
-const PROPOSITION = ["My suggestion is "];
-const ASK_NAME = ["Under what name should I reserve ? "];
-const MISUNDERSTAND = ["I didn't understand. "];
-const AGREE = ["Do you agree ? "];
-const FINISH = ["May I place an order ? "];
+const PROPOSITION = ["My suggestion is ","I may suggest you ","A possible choice would be ","I allowed myself to choose ","Maybe "];
+const ASK_NAME = ["Under what name should I reserve ? ","What's your last name ? ","Wh"];
+const MISUNDERSTAND = ["Sorry, I didn't understand. ","What did you just said ? ","I didn't heared well. "];
+const AGREE = ["Do you agree ? ","Is it ok for you ? ","Is it alright ? "];
+const FINISH = ["May I place an order ? ","Is everything right ? ",];
 const READY = ["A table is available "];
 const SUCCESS = ["Your reservation was completed "];
 const HOWMANY = ["How many person are coming ? "];
@@ -116,7 +117,7 @@ app.post('/', function (req, res) {
     function confirmation (assistant) {
 
         createDateMessage(assistant);
-        let message = "at the restaurant " + assistant.data.restaurant + " on " + assistant.data.date + " at " + assistant.data.time + ". ";
+        let message = "the restaurant " + assistant.data.restaurant + " on " + assistant.data.date.substring(5) + " at " + assistant.data.time + ". ";
         if (assistant.data.problem != false) {
             assistant.ask(assistant.data.problem);
             return;
@@ -217,6 +218,17 @@ app.post('/', function (req, res) {
     // intents
 
     function start (assistant) {
+        
+        assistant.data.proposition = false;
+        assistant.data.message = "";
+        assistant.data.problem = false;
+        assistant.data.date ="";
+        assistant.data.name ="";
+        assistant.data.restaurant ="";
+        assistant.data.places="";
+        assistant.data.time ="";
+
+
         assistant.data.state = WELCOME_STATE;
         assistant.ask(R(assistant, WELCOME) );
     }
@@ -229,7 +241,6 @@ app.post('/', function (req, res) {
 
     function reserve (assistant) {
 
-        assistant.setContext("asknumber",0)
         assistant.data.proposition = false;
         assistant.data.message = "";
         assistant.data.problem = false;
@@ -249,7 +260,10 @@ app.post('/', function (req, res) {
             assistant.data.places = parseInt(number);
         }
 
-        if (datebis) {
+        if (datebis) { 
+            if (parseInt(datebis) == NaN) {
+                assistant.data.problem(R(assistant,MISUNDERSTAND) + "What was the date ? ")
+            }
             assistant.data.date = datebis;
         } else if (!assistant.data.date) {
             assistant.data.date = todayNormalized;
@@ -324,6 +338,7 @@ app.post('/', function (req, res) {
             return;
         }
         if (assistant.data.state == YES_NO_STATE) {
+            assistant.data.proposition = false;
             assistant.data.state = CONFIRM_STATE;
             confirmation(assistant);
         }
