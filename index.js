@@ -24,13 +24,13 @@ const CHANGE_STATE= "change";
 const PROPOSITION = ["My suggestion is ","I may suggest you ","A possible choice would be ","I allowed myself to choose ","Maybe "];
 const MISUNDERSTAND = ["Sorry, I didn't understand. ","What did you just said ? ","I didn't heared well. "];
 const AGREE = ["Do you agree ? ","Is it ok for you ? ","Is it alright ? "];
-const FINISH = ["May I place an order ? ","Is everything right ? ",];
-const READY = ["A table is available "];
-const SUCCESS = ["Your reservation was completed "];
-const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. "];
-const BYE = ["Alright then, come back soon ! "];
-const CHANGE = ["What should I change ? "];
-const NOROOM = ["There is no room ","They haven't got any seats "];
+const FINISH = ["May I place an order ? ","Is everything right ? ","May I proceed ? "];
+const READY = ["A table is available ","There's still place ","It's possible to reserve"];
+const SUCCESS = ["Your reservation was completed under the name of ","Everything went well. The table was ordered with the name ","The order was made under the name : "];
+const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. ","Hello ! I'm able to get a reservation for a restaurant in Strasbourg. ","Howdy ! Do you want a reservation in a Strasbourg's restaurant ? "];
+const BYE = ["Alright then, come back soon ! ","Well, goodbye. See you soon.","You're leaving yet ? Until next time !"];
+const CHANGE = ["What should I change ? ","Tell me what hes to be modified. ","What has to be replaced ? "];
+const NOROOM = ["There is no room ","They haven't got any seats ","It's full "];
 
 const MONTH = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAY = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
@@ -97,12 +97,16 @@ app.post('/', function (req, res) {
         let time = assistant.data.time;
         let minutes = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
         let T = disponible(dispo,minutes);
-        if (T === true) {
+        if (T == time) {
              //Tout est bon
             console.log("tout est bon");
         } else if (T === false) {
             //Pas de place ce jour
             console.log("Pas de place ce jour");
+
+
+
+
         } else {
             //Pas de place à cette heure mais à une autre heure le même jour
             console.log("Une place à une autre heure");
@@ -115,16 +119,7 @@ app.post('/', function (req, res) {
             assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
             return;
         }
-        if (!assistant.data.name) {
-            assistant.setContext("information");
-            if (assistant.data.state == GIVE_NAME_STATE) {
-                assistant.ask(R(assistant, MISUNDERSTAND) + R(assistant, ASK_NAME));
-                return;
-            }
-            assistant.data.state = GIVE_NAME_STATE;
-            assistant.ask(R(assistant, READY) + "for " + assistant.data.places + " person" + (assistant.data.places>1 ? "s ":" ") + message + R(assistant, ASK_NAME));
-            return;
-        }
+
         if (assistant.data.state == CONFIRM_STATE || assistant.data.state == GIVE_NAME_STATE) {
             reserver(assistant);
             return;
@@ -149,7 +144,7 @@ app.post('/', function (req, res) {
             console.log("valide");
             horaires[restaurant][date][creneau] = horaires[restaurant][date][creneau].substring(0,18) + (placeRestante-places).toString();
             console.log(horaires[restaurant][date][creneau]);
-            assistant.tell(R(assistant, SUCCESS)  + "under the name of " + assistant.data.name);
+            assistant.tell(R(assistant, SUCCESS) + assistant.data.name);
         } else {
             console.log("invalide");
             assistant.ask("There was an error, the places are not available anymore. ");
@@ -176,13 +171,13 @@ app.post('/', function (req, res) {
 
             if (min<=time && time<=max && placeRestante >= assistant.data.places) {
                 assistant.data.creneau = i;
-                return true;
+                return ('0' + (min/60).toString()).slice(-2) + ':' + ('0' + (min-(min/60)*60).toString()).slice(-2);
             } else if (placeRestante >= assistant.data.places) {
-                if (time<min && possibleTime[0] == undefined) {
+                if (time>max) {
                     possibleTime[0] = min;
                     possibleTime[2] = i;
-                } else if (time>max) {
-                    possibleTime[1] = max;
+                } else if (time<min && possibleTime[0] == undefined) {
+                    possibleTime[1] = min;
                     possibleTime[3] = i;
                 }
             }
@@ -257,7 +252,7 @@ app.post('/', function (req, res) {
         let date = assistant.data.date;
         
         if (timebis) {
-            assistant.data.time = timebis;
+            assistant.data.time = timebis.substring(0,5);
         } else if (!assistant.data.time) {
             assistant.data.proposition = true;
             if (date == todayNormalized) {
@@ -294,28 +289,6 @@ app.post('/', function (req, res) {
 
         confirmation(assistant);
 
-        if (true) {
-            let time = assistant.data.time;
-            let minutes = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
-            let T = disponible(dispo,minutes);
-            if (T === true) {
-                //Tout est bon
-                console.log("tout est bon");
-                confirmation(assistant);
-            } else if (T === false) {
-                //Pas de place ce jour
-                console.log("Pas de place ce jour");
-                assistant.data.problem = R(assistant, NOROOM) + "this day. ";
-                confirmation(assistant);
-            } else {
-                //Pas de place à cette heure mais à une autre heure le même jour
-                console.log("Une place à une autre heure");
-                assistant.data.proposition = true;
-                assistant.data.time = T;
-                assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
-                
-            }
-        }
     }
 
     function yes (assistant) {
