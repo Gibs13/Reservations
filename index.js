@@ -32,6 +32,7 @@ const WHICH_RESTAURANT = ["In which restaurant do you want to go ? "];
 const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. "];
 const BYE = ["Alright then, come back soon ! "];
 const CHANGE = ["What should I change ? "];
+const NOROOM = ["There is no room ","They haven't got any seats "]
 
 
 // Function Handler
@@ -56,7 +57,7 @@ app.post('/', function (req, res) {
         }
     }*/
 
-    function R (assistant, array) {
+    function R(assistant, array) {
         let prompt = array[Math.floor(Math.random() * (array.length))];
         return prompt;
     }
@@ -115,24 +116,24 @@ app.post('/', function (req, res) {
     function confirmation (assistant) {
 
         createDateMessage(assistant);
-        let message = "au restaurant " + assistant.data.restaurant + " le " + assistant.data.date + " à " + assistant.data.time + ". ";
+        let message = "at the restaurant " + assistant.data.restaurant + " on " + assistant.data.date + " at " + assistant.data.time + ". ";
         if (assistant.data.problem != false) {
             assistant.ask(assistant.data.problem);
             return;
         }
         if (assistant.data.proposition) {
-            assistant.ask(assistant.data.message + "Je peux vous proposer d'aller manger " + message + "Etes vous d'accord ? ");
+            assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
             assistant.data.state = YES_NO_STATE;
             return;
         }
         if (!assistant.data.name) {
             assistant.setContext("information");
             if (assistant.data.state == GIVE_NAME_STATE) {
-                assistant.ask("Je n'ai pas compris votre nom. ");
+                assistant.ask(R(assistant, MISUNDERSTAND) + R(assistant, ASK_NAME));
                 return;
             }
             assistant.data.state = GIVE_NAME_STATE;
-            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "A quel nom dois-je reserver ? ");
+            assistant.ask(R(assistant, READY) + "for " + assistant.data.places + " person" + (assistant.data.places>1 ? "s ":" ") + message + R(assistant, ASK_NAME));
             return;
         }
         if (assistant.data.state == CONFIRM_STATE || assistant.data.state == GIVE_NAME_STATE) {
@@ -140,7 +141,7 @@ app.post('/', function (req, res) {
             return;
         } else {
             assistant.data.state = YES_NO_STATE;
-            assistant.ask("Une table est prête pour " + assistant.data.places + " personne" + (assistant.data.places>1 ? "s ":" ") + message + "Dois-je finaliser la réservation ?");
+            assistant.ask(R(assistant, READY) + "for " + assistant.data.places + " person" + (assistant.data.places>1 ? "s ":" ") + message + R(assistant, FINISH));
             return;
         }        
         
@@ -159,10 +160,10 @@ app.post('/', function (req, res) {
             console.log("valide");
             horaires[restaurant][date][creneau] = horaires[restaurant][date][creneau].substring(0,18) + (placeRestante-places).toString();
             console.log(horaires[restaurant][date][creneau]);
-            assistant.tell("Votre table à été reservée avec succès au nom de " + assistant.data.name);
+            assistant.tell(R(assistant, SUCCESS)  + "under the name of " + assistant.data.name);
         } else {
             console.log("invalide");
-            assistant.ask("Il y a eu un problème, le nombre de place n'est plus bon.");
+            assistant.ask("There was an error, the places are not available anymore. ");
         }
     
     }
@@ -217,7 +218,7 @@ app.post('/', function (req, res) {
 
     function start (assistant) {
         assistant.data.state = WELCOME_STATE;
-        assistant.ask("Bienvenue, souhaitez vous reserver un restaurant ?");
+        assistant.ask(R(assistant, WELCOME) );
     }
     
     function choose (assistant) {
@@ -277,7 +278,7 @@ app.post('/', function (req, res) {
                 assistant.data.restaurant = rand;
                 assistant.data.proposition = true;
             } else {
-                assistant.ask("Dans quel restaurant souhaiteriez vous aller ? ");
+                assistant.ask(R(assistant, WHICH_RESTAURANT) );
                 return;
             }
         }
@@ -288,7 +289,7 @@ app.post('/', function (req, res) {
 
         if (!assistant.data.places) {
             assistant.setContext("asknumber",5);
-            assistant.ask("Combien serez-vous ? ");
+            assistant.ask(R(assistant, HOWMANY) );
             return;
         }
 
@@ -303,14 +304,14 @@ app.post('/', function (req, res) {
             } else if (T === false) {
                 //Pas de place ce jour
                 console.log("Pas de place ce jour");
-                assistant.data.problem = "Il n'y a pas de place ce jour-çi. ";
+                assistant.data.problem = R(assistant, NOROOM) + "this day. ";
                 confirmation(assistant);
             } else {
                 //Pas de place à cette heure mais à une autre heure le même jour
                 console.log("Une place à une autre heure");
                 assistant.data.proposition = true;
                 assistant.data.time = T;
-                assistant.data.message += "Il n'y a pas de place à cette heure là. ";
+                assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
                 confirmation(assistant);
             }
         }
@@ -319,7 +320,7 @@ app.post('/', function (req, res) {
     function yes (assistant) {
         if (assistant.data.state == WELCOME_STATE) {
             assistant.data.state = RESERVE_STATE;
-            assistant.ask("Dans quel restaurant souhaiteriez vous aller ? ")
+            assistant.ask(R(assistant, WHICH_RESTAURANT))
             return;
         }
         if (assistant.data.state == YES_NO_STATE) {
@@ -336,14 +337,14 @@ app.post('/', function (req, res) {
         }
         if (assistant.data.state == YES_NO_STATE) {
             assistant.data.state = CHOOSE_STATE;
-            assistant.ask("What should I change ? ");
+            assistant.ask(R(assistant, CHANGE));
             return;
         }
 
     }
 
     function quit (assistant) {
-        assistant.tell('Goodbye!');
+        assistant.tell(R(assistant, BYE));
     }
 
 
