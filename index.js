@@ -158,23 +158,26 @@ app.post('/', function (req, res) {
                 assistant.data.creneau = i;
                 return true;
             } else if (placeRestante >= assistant.data.places) {
-                if (time<min) {
+                if (time<min && possibleTime[0] == undefined) {
                     possibleTime[0] = min;
                     possibleTime[2] = i;
-                } else if (time>max && possibleTime[1] == undefined) {
+                } else if (time>max) {
                     possibleTime[1] = max;
                     possibleTime[3] = i;
                 }
             }
         }
+        let rightTime;
         if (possibleTime == []) {
             return false;
+        } else if (!possibleTime[0]) {
+            rightTime = possibleTime[1];
+        } else if (!possibleTime[1]) {
+            rightTime = possibleTime[0];
+        } else {
+            rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
         }
-        console.log(possibleTime)
-        let rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
-        console.log("right time : " + rightTime);
         assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
-        console.log("creneau : " + assistant.data.creneau);
         let answer = (0 + (rightTime/60).toString()).substring(-2) + ':' + (0 + (rightTime-(rightTime/60)*60).toString()).substring(-2);
         console.log("temps proposé : " + answer);
         return answer;
