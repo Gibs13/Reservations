@@ -122,8 +122,8 @@ app.post('/', function (req, res) {
             return;
         }
         if (assistant.data.proposition) {
-            assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
             assistant.data.state = YES_NO_STATE;
+            assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
             return;
         }
         if (!assistant.data.name) {
