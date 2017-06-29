@@ -167,7 +167,7 @@ app.post('/', function (req, res) {
                         rightTime = max-40;
                     } else {
                         rightTime = time;
-                    } Math.floor
+                    } 
                     console.log("rightTime : " + rightTime);
                     console.log(('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2));
                     return ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
@@ -203,7 +203,7 @@ app.post('/', function (req, res) {
             assistant.data.proposition = true;
             assistant.data.ct = 1;
         }
-        let answer = ('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2);
+        let answer = ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
         console.log("temps proposé : " + answer);
         return answer;
     }
