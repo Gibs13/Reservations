@@ -159,13 +159,16 @@ app.post('/', function (req, res) {
                 if (placeRestante >= assistant.data.places) {
                     assistant.data.creneau = i;
                     let rightTime;
-                    if (!assistant.data.proposition && max-time > 40) {
-                        assistant.data.message += "You can only order a bit earlier. ";
+                    if (max-time < 40) {
+                        if (!assistant.data.proposition) {
+                            assistant.data.message += "You can only order a bit earlier. ";
+                        }
                         assistant.data.ct = 1;
                         rightTime = max-40;
                     } else {
                         rightTime = time;
                     }
+                    console.log("rightTime : " + rightTime);
                     return ('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2);
                 } else {
                     if (!assistant.data.proposition) {
