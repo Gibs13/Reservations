@@ -50,7 +50,6 @@ app.post('/', function (req, res) {
 
     function confirmation (assistant) {
 
-        let message = "the restaurant " + assistant.data.restaurant + " on " + assistant.data.date.substring(5) + " at " + assistant.data.time + ". ";
         if (assistant.data.problem != false) {
             assistant.ask(assistant.data.problem);
             return;
@@ -105,22 +104,26 @@ app.post('/', function (req, res) {
             return;
         }
 
+        message = createMessage(assistant);
+
         if (assistant.data.proposition) {
             assistant.data.state = YES_NO_STATE;
             assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
             return;
-        }
-
-        if (assistant.data.state == CONFIRM_STATE || assistant.data.state == GIVE_NAME_STATE) {
-            reserver(assistant);
-            return;
         } else {
             assistant.data.state = YES_NO_STATE;
-            assistant.ask(R(assistant, READY) + "for " + assistant.data.places + " person" + (assistant.data.places>1 ? "s ":" ") + message + R(assistant, FINISH));
+            assistant.ask(R(assistant, READY) + message + R(assistant, FINISH));
             return;
         }        
-        
+    }
 
+    function createMessage(assistant) {
+        let cd = assistant.getArgument('cd');
+        let cr = assistant.getArgument('cr');
+        let cln = assistant.getArgument('cln');
+        let cn = assistant.getArgument('cn');
+        let ct = assistant.getArgument('ct');
+        return (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant+" ":"")+(cd?"on "+assistant.data.date.substring(5)+" ":"")+(ct?"at "+assistant.data.time+" ":"")+(cln?"with the name "+assistant.data.name+" ":"")+". ";
     }
 
     function reserver (assistant) {
@@ -257,26 +260,30 @@ app.post('/', function (req, res) {
     }
 
     function yes (assistant) {
-        if (assistant.data.state == WELCOME_STATE) {
+        let state = assistant.data.state;
+        if (state == WELCOME_STATE) {
             assistant.data.state = RESERVE_STATE;
             assistant.ask("Choose your restaurant. ")
             return;
         }
-        if (assistant.data.state == YES_NO_STATE) {
+        if (state == RESERVE_STATE) {
+            
+        }
+        if (state == YES_NO_STATE) {
             assistant.data.proposition = false;
-            assistant.data.state = CONFIRM_STATE;
-            confirmation(assistant);
+            reserver(assistant);;
         }
 
     }
 
     function no (assistant) {
-        if (assistant.data.state == WELCOME_STATE) {
+        let state = assistant.data.state;
+        if (state == WELCOME_STATE) {
             quit(assistant);
             return;
         }
-        if (assistant.data.state == YES_NO_STATE) {
-            assistant.data.state = CHOOSE_STATE;
+        if (state == YES_NO_STATE) {
+            assistant.data.state = RESERVE_STATE;
             assistant.ask(R(assistant, CHANGE));
             return;
         }
