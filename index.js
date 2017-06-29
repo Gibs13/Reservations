@@ -48,20 +48,8 @@ app.post('/', function (req, res) {
         return array[Math.floor(Math.random() * (array.length))];
     }
 
-    function createDateMessage(assistant) {
-        let date = assistant.data.date;
-        let month = date.substring(5,7);
-        let day = date.substring(8,10);
-        let todayMonth = today.getMonth();
-        let todayDay = today.getDate();
-        let message = "";
-
-
-    }
-
     function confirmation (assistant) {
 
-        createDateMessage(assistant);
         let message = "the restaurant " + assistant.data.restaurant + " on " + assistant.data.date.substring(5) + " at " + assistant.data.time + ". ";
         if (assistant.data.problem != false) {
             assistant.ask(assistant.data.problem);
@@ -104,9 +92,11 @@ app.post('/', function (req, res) {
         } else {
             //Pas de place à cette heure mais à une autre heure le même jour
             console.log("Une place à une autre heure");
-            assistant.data.proposition = true;
             assistant.data.time = T;
-            assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
+            if (!assistant.data.proposition) {
+                assistant.data.proposition = true;
+                assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
+            }
         }
 
         }  
@@ -214,10 +204,7 @@ app.post('/', function (req, res) {
 
 
         assistant.data.state = WELCOME_STATE;
-        assistant.ask(R(assistant, WELCOME) );
-    }
-    
-    function choose (assistant) {
+        assistant.ask(R(assistant, WELCOME));
     }
 
     function reserve (assistant) {
@@ -226,32 +213,29 @@ app.post('/', function (req, res) {
         assistant.data.message = "";
         assistant.data.problem = false;
         assistant.data.state = RESERVE_STATE;
-        let resto = assistant.getArgument('resto');
+        assistant.data.restaurant = assistant.getArgument('resto').toUpperCase();
         let datebis = assistant.getArgument('datebis');
         let timebis = assistant.getArgument('timebis');
         let lastname = assistant.getArgument('last-name');
-        let number = assistant.getArgument('number');
+        assistant.data.places = parseInt(assistant.getArgument('number'));
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
 
-        assistant.data.places = parseInt(number);
-
         if (isNaN(assistant.data.places)) {
-                assistant.setContext(CHOOSE_STATE);
-                assistant.data.problem == "I didn't understand the number. "
+                assistant.data.problem = "I didn't understand the number of persons. "
             }
 
         if (datebis == "today") {
             assistant.data.date = todayNormalized;
         } else if (parseInt(datebis) == NaN) {
-            assistant.data.problem == "What was the date ? ";
+            assistant.data.problem = "What was the date ? ";
         } else {
-        assistant.data.date = datebis;
+            assistant.data.date = datebis;
         }
         let date = assistant.data.date;
         
-        if (timebis) {
+        if (timebis && !isNaN(parseInt(timebis))) {
             assistant.data.time = timebis.substring(0,5);
-        } else if (!assistant.data.time) {
+        } else {
             assistant.data.proposition = true;
             if (date == todayNormalized) {
                 assistant.data.time = ('0' + (today.getHours()+3).toString()).slice(-2) + ":" + ('0' + today.getMinutes().toString()).slice(-2);
@@ -259,21 +243,6 @@ app.post('/', function (req, res) {
                 assistant.data.time = "12:30";
             }
         }
-
-
-        if (resto) {
-            assistant.data.restaurant = resto.toUpperCase();
-        }/* else if (!assistant.data.restaurant) {
-            let rand = select(Object.keys(horaires));
-            console.log("random restaurant selected : " +rand);
-            if (horaires[rand][date] && 0 in horaires[rand][date]){
-                assistant.data.restaurant = rand;
-                assistant.data.proposition = true;
-            } else {
-                assistant.ask(R(assistant, WHICH_RESTAURANT) );
-                return;
-            }
-        }*/
 
         let restaurant = assistant.data.restaurant;
         console.log(restaurant);
@@ -290,7 +259,7 @@ app.post('/', function (req, res) {
     function yes (assistant) {
         if (assistant.data.state == WELCOME_STATE) {
             assistant.data.state = RESERVE_STATE;
-            assistant.ask("Choose your restaurant.")
+            assistant.ask("Choose your restaurant. ")
             return;
         }
         if (assistant.data.state == YES_NO_STATE) {
