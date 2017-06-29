@@ -63,12 +63,10 @@ app.post('/', function (req, res) {
         let maxDays = new Date(date.substring(0,4),month,0).getDate();
         let tries = 0;
 
-        let dispo = horaires[assistant.data.restaurant][date];
-
         while (T === false) {
 
 
-        T = disponible(dispo,minutes);
+        T = disponible(date,minutes);
         if (T === false) {
             //Pas de place ce jour
             console.log("Pas de place ce jour");
@@ -82,7 +80,6 @@ app.post('/', function (req, res) {
                 day = 1;
             }
             date = date.substring(0,4)+'-'+('0'+month.toString()).slice(-2)+'-'+('0'+day.toString()).slice(-2);
-            dispo = horaires[assistant.data.restaurant][date];
 
         } else if (Math.abs(parseInt(T.substring(0,2))*60 + parseInt(T.substring(3,5)) - minutes) <= 15) {
              //Tout est bon
@@ -146,11 +143,12 @@ app.post('/', function (req, res) {
     
     }
 
-    function disponible(horairesJour, time) {
+    function disponible(date, time) {
         let min;
         let max;
         let possibleTime = [];
         let placeRestante;
+        let horairesJour = horaires[assistant.data.restaurant][date];
         if (isNaN(time)) {
             console.log("Nan");
         }
@@ -167,7 +165,7 @@ app.post('/', function (req, res) {
                 assistant.data.creneau = i;
                 return ('0' + (min/60).toString()).slice(-2) + ':' + ('0' + (min-(min/60)*60).toString()).slice(-2);
             } else if (placeRestante >= assistant.data.places) {
-                if (time>max) {
+                if (time>max && today.getDate() != parseInt(date.substring(8,10) )) {
                     possibleTime[0] = min;
                     possibleTime[2] = i;
                 } else if (time<min && possibleTime[0] == undefined) {
@@ -219,7 +217,7 @@ app.post('/', function (req, res) {
         assistant.data.restaurant = assistant.getArgument('resto').toUpperCase();
         let datebis = assistant.getArgument('datebis');
         let timebis = assistant.getArgument('timebis');
-        let lastname = assistant.getArgument('last-name');
+        assistant.data.name = assistant.getArgument('last-name');
         assistant.data.places = parseInt(assistant.getArgument('number'));
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
 
