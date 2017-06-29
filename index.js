@@ -99,7 +99,7 @@ app.post('/', function (req, res) {
                 day = 1;
             }
             date = date.substring(0,4)+'-'+('0'+month.toString()).slice(-2)+'-'+('0'+day.toString()).slice(-2);
-            dispo = assistant.data.horaires[assistant.data.restaurant][date];
+            dispo = horaires[assistant.data.restaurant][date];
 
         } else {
             //Pas de place à cette heure mais à une autre heure le même jour
