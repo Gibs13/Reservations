@@ -76,7 +76,7 @@ app.post('/', function (req, res) {
         let maxDays = new Date(date.substring(0,4),month,0).getDate();
         let tries = 0;
 
-        let dispo = assistant.data.horaires[assistant.data.restaurant][date];
+        let dispo = horaires[assistant.data.restaurant][date];
 
         while (T === false) {
 
