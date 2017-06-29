@@ -169,7 +169,7 @@ app.post('/', function (req, res) {
                 if (time>max && today.getDate() != parseInt(date.substring(8,10) )) {
                     possibleTime[0] = min;
                     possibleTime[2] = i;
-                } else if (time<min && possibleTime[0] == undefined) {
+                } else if (time<min && possibleTime[1] == undefined) {
                     possibleTime[1] = min;
                     possibleTime[3] = i;
                 }
@@ -240,7 +240,7 @@ app.post('/', function (req, res) {
         } else {
             assistant.data.proposition = true;
             if (date == todayNormalized) {
-                assistant.data.time = ('0' + (today.getHours()+2).toString()).slice(-2) + ":" + ('0' + (today.getMinutes()+30).toString()).slice(-2);
+                assistant.data.time = ('0' + (today.getHours()+2+(today.getMinutes()+20>60?1:0)).toString()).slice(-2) + ":" + ('0' + (today.getMinutes()+20-Math.floor((today.getMinutes()+20)/60)*60).toString()).slice(-2);
             } else {
                 assistant.data.time = "12:30";
             }
