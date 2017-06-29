@@ -82,21 +82,8 @@ app.post('/', function (req, res) {
             }
             date = date.substring(0,4)+'-'+('0'+month.toString()).slice(-2)+'-'+('0'+day.toString()).slice(-2);
 
-        } else if (Math.abs(parseInt(T.substring(0,2))*60 + parseInt(T.substring(3,5)) - minutes) <= 15) {
-             //Tout est bon
-            console.log("tout est bon");
-            assistant.data.time = T;
         } else {
-            //Pas de place à cette heure mais à une autre heure le même jour
-            console.log("Une place à une autre heure");
             assistant.data.time = T;
-            if (!assistant.data.proposition) {
-                assistant.data.proposition = true;
-                
-                assistant.data.ct = 1;
-
-                assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
-            }
         }
 
         }  
@@ -113,7 +100,7 @@ app.post('/', function (req, res) {
             return;
         } else {
             assistant.data.state = YES_NO_STATE;
-            assistant.ask(R(assistant, READY) + message + R(assistant, FINISH));
+            assistant.ask(assistant.data.message + R(assistant, READY) + message + R(assistant, FINISH));
             return;
         }        
     }
@@ -165,9 +152,29 @@ app.post('/', function (req, res) {
             
             console.log("min : "+min+" max : "+max+" time : "+time);
 
-            if (today.getDate() != parseInt(date.substring(8,10)) && min<=time && time<=max && placeRestante >= assistant.data.places) {
-                assistant.data.creneau = i;
-                return ('0' + (min/60).toString()).slice(-2) + ':' + ('0' + (min-(min/60)*60).toString()).slice(-2);
+            // Teste si le créneau est bon
+            // Si oui, assez de place => on revoit une heure acceptable, pas assez => On va annoncer qu'il n'y avait pas assez de place
+            // Si non, est ce que le créneau avant ou celui après est disponible 
+
+            if (today.getDate() != parseInt(date.substring(8,10)) && min<=time && time<=max) {
+                if (placeRestante >= assistant.data.places) {
+                    assistant.data.creneau = i;
+                    let rightTime;
+                    if (!assistant.data.proposition && max-time > 40) {
+                        assistant.data.message += "You can only order a bit earlier. ";
+                        assistant.data.ct = 1;
+                        rightTime = max-40;
+                    } else {
+                        rightTime = time;
+                    }
+                    return ('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2);
+                } else {
+                    if (!assistant.data.proposition) {
+                        assistant.data.message += "There's only "+placeRestante+" places at this hour. ";
+                        assistant.data.proposition = true;
+                        assistant.data.ct = 1;
+                    }
+                }
             } else if (placeRestante >= assistant.data.places) {
                 if (time>max && today.getDate() != parseInt(date.substring(8,10) )) {
                     possibleTime[0] = min;
@@ -189,6 +196,10 @@ app.post('/', function (req, res) {
             rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
         }
         assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
+        if (!assistant.data.proposition && Math.abs(rightTime - time) > 15) {
+            assistant.data.proposition = true;
+            assistant.data.ct = 1;
+        }
         let answer = ('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2);
         console.log("temps proposé : " + answer);
         return answer;
