@@ -169,6 +169,7 @@ app.post('/', function (req, res) {
                         rightTime = time;
                     }
                     console.log("rightTime : " + rightTime);
+                    console.log(('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2));
                     return ('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2);
                 } else {
                     if (!assistant.data.proposition) {
