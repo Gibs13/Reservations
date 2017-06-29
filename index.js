@@ -161,7 +161,7 @@ app.post('/', function (req, res) {
             
             console.log("min : "+min+" max : "+max+" time : "+time);
 
-            if (min<=time && time<=max && placeRestante >= assistant.data.places) {
+            if (min<=time && time<=max && placeRestante >= assistant.data.places && (today.getDate() != parseInt(date.substring(8,10)) || (today.getMinutes()+30+(today.getHours()+2)*60)<min ) ) {
                 assistant.data.creneau = i;
                 return ('0' + (min/60).toString()).slice(-2) + ':' + ('0' + (min-(min/60)*60).toString()).slice(-2);
             } else if (placeRestante >= assistant.data.places) {
