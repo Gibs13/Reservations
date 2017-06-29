@@ -42,7 +42,7 @@ const DAY = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sund
 app.post('/', function (req, res) {
     const assistant = new ApiAiApp({request: req, response: res});
     let today = new Date();
-    console.log("today : " + today.getDay()+" "+today.getMonth()+" "+today.getHours()+" "+today.getMinutes());
+    console.log("today : " + today.getDate()+" "+(today.getMonth()+1)+" "+today.getHours()+" "+today.getMinutes());
 
     // Pour selectionner un element d'une liste
     function R(assistant, array) {
@@ -162,7 +162,7 @@ app.post('/', function (req, res) {
             
             console.log("min : "+min+" max : "+max+" time : "+time);
 
-            if (min<=time && time<=max && placeRestante >= assistant.data.places && (today.getDate() != parseInt(date.substring(8,10)) || (today.getMinutes()+30+(today.getHours())*60)<min ) ) {
+            if (today.getDate() != parseInt(date.substring(8,10)) && min<=time && time<=max && placeRestante >= assistant.data.places) {
                 assistant.data.creneau = i;
                 return ('0' + (min/60).toString()).slice(-2) + ':' + ('0' + (min-(min/60)*60).toString()).slice(-2);
             } else if (placeRestante >= assistant.data.places) {
@@ -240,7 +240,7 @@ app.post('/', function (req, res) {
         } else {
             assistant.data.proposition = true;
             if (date == todayNormalized) {
-                assistant.data.time = ('0' + (today.getHours()+3).toString()).slice(-2) + ":" + ('0' + today.getMinutes().toString()).slice(-2);
+                assistant.data.time = ('0' + (today.getHours()+2).toString()).slice(-2) + ":" + ('0' + (today.getMinutes()+30).toString()).slice(-2);
             } else {
                 assistant.data.time = "12:30";
             }
