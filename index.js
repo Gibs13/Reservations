@@ -119,11 +119,11 @@ app.post('/', function (req, res) {
     }
 
     function createMessage(assistant) {
-        let cd = assistant.getArgument('cd');
-        let cr = assistant.getArgument('cr');
-        let cln = assistant.getArgument('cln');
-        let cn = assistant.getArgument('cn');
-        let ct = assistant.getArgument('ct');
+        let cd = assistant.data.cd;
+        let cr = assistant.data.cr;
+        let cln = assistant.data.cln;
+        let cn = assistant.data.cn;
+        let ct = assistant.data.ct;
         return (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant+" ":"")+(cd?"on "+assistant.data.date.substring(5)+" ":"")+(ct?"at "+assistant.data.time+" ":"")+(cln?"with the name "+assistant.data.name+" ":"")+". ";
     }
 
