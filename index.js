@@ -93,13 +93,12 @@ app.post('/', function (req, res) {
         }
 
         let message = createMessage(assistant);
-
+        
+        assistant.data.state = YES_NO_STATE;
         if (assistant.data.proposition) {
-            assistant.data.state = YES_NO_STATE;
             assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
             return;
         } else {
-            assistant.data.state = YES_NO_STATE;
             assistant.ask(assistant.data.message + R(assistant, READY) + message + R(assistant, FINISH));
             return;
         }        
@@ -177,7 +176,7 @@ app.post('/', function (req, res) {
                 }
             } else if (placeRestante >= assistant.data.places) {
                 if (time>max && today.getDate() != parseInt(date.substring(8,10) )) {
-                    possibleTime[0] = min;
+                    possibleTime[0] = max-40;
                     possibleTime[2] = i;
                 } else if (time<min && possibleTime[1] == undefined) {
                     possibleTime[1] = min;
@@ -284,13 +283,12 @@ app.post('/', function (req, res) {
             assistant.data.state = RESERVE_STATE;
             assistant.ask("Choose your restaurant. ")
             return;
-        }
-        if (state == RESERVE_STATE) {
-            
-        }
+        } else
         if (state == YES_NO_STATE) {
             assistant.data.proposition = false;
             reserver(assistant);;
+        } else {
+            assistant.ask("I'm not sure of what you wanted. ");
         }
 
     }
@@ -300,11 +298,13 @@ app.post('/', function (req, res) {
         if (state == WELCOME_STATE) {
             quit(assistant);
             return;
-        }
+        } else
         if (state == YES_NO_STATE) {
             assistant.data.state = RESERVE_STATE;
             assistant.ask(R(assistant, CHANGE));
             return;
+        } else {
+            assistant.ask("I'm not sure of what you wanted. ");
         }
 
     }
@@ -321,7 +321,6 @@ app.post('/', function (req, res) {
     actionMap.set('start', start);
     actionMap.set('reserve', reserve);
     actionMap.set('quit', quit);
-    actionMap.set('confirmation', confirmation);
     actionMap.set('yes', yes);
     actionMap.set('no', no);
 
