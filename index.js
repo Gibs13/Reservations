@@ -92,6 +92,7 @@ app.post('/', function (req, res) {
             assistant.data.time = T;
             if (!assistant.data.proposition) {
                 assistant.data.proposition = true;
+                assistant.data.ct = 1;
                 assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
             }
         }
