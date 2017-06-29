@@ -236,7 +236,7 @@ app.post('/', function (req, res) {
 
         if (datebis == "today") {
             assistant.data.date = todayNormalized;
-        } else if (parseInt(datebis) == NaN) {
+        } else if (isNaN(parseInt(datebis))) {
             assistant.data.problem = "What was the date ? ";
         } else {
             assistant.data.date = datebis;
@@ -247,6 +247,7 @@ app.post('/', function (req, res) {
             assistant.data.time = timebis.substring(0,5);
         } else {
             assistant.data.proposition = true;
+            assistant.data.ct = 1;
             if (date == todayNormalized) {
                 assistant.data.time = ('0' + (today.getHours()+2+(today.getMinutes()+20>60?1:0)).toString()).slice(-2) + ":" + ('0' + (today.getMinutes()+20-Math.floor((today.getMinutes()+20)/60)*60).toString()).slice(-2);
             } else {
