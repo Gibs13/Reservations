@@ -252,9 +252,6 @@ app.post('/', function (req, res) {
             } else {
                 assistant.data.time = "12:30";
             }
-            let reserve = assistant.getContext('reserve');
-            reserve.parameters.timebis = assistant.data.time;
-            assistant.setContext('reserve',5,reserve.parameters);
         }
 
         let restaurant = assistant.data.restaurant;
