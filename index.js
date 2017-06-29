@@ -167,10 +167,10 @@ app.post('/', function (req, res) {
                         rightTime = max-40;
                     } else {
                         rightTime = time;
-                    }
+                    } Math.floor
                     console.log("rightTime : " + rightTime);
-                    console.log(('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2));
-                    return ('0' + (rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-(rightTime/60)*60).toString()).slice(-2);
+                    console.log(('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2));
+                    return ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
                 } else {
                     if (!assistant.data.proposition) {
                         assistant.data.message += "There's only "+placeRestante+" places at this hour. ";
