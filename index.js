@@ -104,7 +104,7 @@ app.post('/', function (req, res) {
             return;
         }
 
-        message = createMessage(assistant);
+        let message = createMessage(assistant);
 
         if (assistant.data.proposition) {
             assistant.data.state = YES_NO_STATE;
