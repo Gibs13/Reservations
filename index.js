@@ -82,11 +82,7 @@ app.post('/', function (req, res) {
 
 
         T = disponible(dispo,minutes);
-        if (Math.abs(parseInt(T.substring(0,2))*60 + parseInt(T.substring(3,5)) - minutes) <= 15) {
-             //Tout est bon
-            console.log("tout est bon");
-            assistant.data.time = T;
-        } else if (T === false) {
+        if (T === false) {
             //Pas de place ce jour
             console.log("Pas de place ce jour");
             if (tries == 7) {
@@ -101,6 +97,10 @@ app.post('/', function (req, res) {
             date = date.substring(0,4)+'-'+('0'+month.toString()).slice(-2)+'-'+('0'+day.toString()).slice(-2);
             dispo = horaires[assistant.data.restaurant][date];
 
+        } else if (Math.abs(parseInt(T.substring(0,2))*60 + parseInt(T.substring(3,5)) - minutes) <= 15) {
+             //Tout est bon
+            console.log("tout est bon");
+            assistant.data.time = T;
         } else {
             //Pas de place à cette heure mais à une autre heure le même jour
             console.log("Une place à une autre heure");
