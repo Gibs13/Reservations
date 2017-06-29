@@ -92,7 +92,11 @@ app.post('/', function (req, res) {
             assistant.data.time = T;
             if (!assistant.data.proposition) {
                 assistant.data.proposition = true;
-                assistant.data.ct = 1;
+
+                let reserve = assistant.getContext('reserve');
+                reserve.parameters.ct = 1;
+                assistant.setContext('reserve',5,reserve.parameters);
+                
                 assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
             }
         }
