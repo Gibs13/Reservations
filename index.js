@@ -30,7 +30,7 @@ const SUCCESS = ["Your reservation was completed under the name of ","Everything
 const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. ","Hello ! I'm able to get a reservation for a restaurant in Strasbourg. ","Howdy ! Do you want a reservation in a Strasbourg's restaurant ? "];
 const BYE = ["Alright then, come back soon ! ","Well, goodbye. See you soon.","You're leaving yet ? Until next time !"];
 const CHANGE = ["What should I change ? ","Tell me what hes to be modified. ","What has to be replaced ? "];
-const NOROOM = ["There is no room ","They haven't got any seats ","It's full "];
+const NOROOM = ["There is no room ","They haven't got any seats ","It's not possible to order "];
 
 const MONTH = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAY = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
@@ -43,25 +43,9 @@ app.post('/', function (req, res) {
     const assistant = new ApiAiApp({request: req, response: res});
     let today = new Date();
 
-    /*function goodDate(assistant) {
-
-        let date = assistant.data.date;
-        console.log(date);
-        let today = new Date();
-        
-        today = [today.getDate(),today.getMonth()+1];
-        date = [parseInt(date.substring(8,10)),parseInt(date.substring(5,7))];
-        console.log(today + '  ' + date)
-        if (date[1]<today[1] || date[0]<today[0]-7) {
-            console.log('plus un mois');
-        } else if (date[0]<today[0]) {
-            console.log('plus une semaine');
-        }
-    }*/
-
+    // Pour selectionner un element d'une liste
     function R(assistant, array) {
-        let prompt = array[Math.floor(Math.random() * (array.length))];
-        return prompt;
+        return array[Math.floor(Math.random() * (array.length))];
     }
 
     function createDateMessage(assistant) {
@@ -75,17 +59,6 @@ app.post('/', function (req, res) {
 
     }
 
-    function select(array) {
-        /*if (assistant.data.state == WELCOME_STATE) {
-            
-            assistant.data.state = RESERVE_STATE;
-            assistant.ask("Voici une liste de vos restaurants préférés proches : " );
-        } else if (assistant.data.state == RESERVE_STATE) {
-            assistant.data.restaurant = restaurants[Math.floor(Math.random()*restaurants.length)];
-        }*/
-        return array[Math.floor(Math.random()*array.length)];
-    }
-
     function confirmation (assistant) {
 
         createDateMessage(assistant);
@@ -96,16 +69,37 @@ app.post('/', function (req, res) {
         }
         let time = assistant.data.time;
         let minutes = parseInt(time.substring(0,2))*60 + parseInt(time.substring(3,5));
-        let T = disponible(dispo,minutes);
-        if (T == time) {
+        let date = assistant.data.date;
+        let T = false;
+        let month = parseInt(date.substring(5,7));
+        let day = parseInt(date.substring(8,10));
+        let maxDays = new Date(date.substring(0,4),month,0).getDate();
+        let tries = 0;
+
+        let dispo = assistant.data.horaires[assistant.data.restaurant][date];
+
+        while (T === false) {
+
+
+        T = disponible(dispo,minutes);
+        if (Math.abs(parseInt(T.substring(0,2))*60 + parseInt(T.substring(3,5)) - minutes) <= 15) {
              //Tout est bon
             console.log("tout est bon");
+            assistant.data.time = T;
         } else if (T === false) {
             //Pas de place ce jour
             console.log("Pas de place ce jour");
-
-
-
+            if (tries == 7) {
+                break;
+            }
+            tries++;
+            day++;
+            if (day > maxDays) {
+                month++;
+                day = 1;
+            }
+            date = date.substring(0,4)+'-'+('0'+month.toString()).slice(-2)+'-'+('0'+day.toString()).slice(-2);
+            dispo = assistant.data.horaires[assistant.data.restaurant][date];
 
         } else {
             //Pas de place à cette heure mais à une autre heure le même jour
@@ -114,6 +108,13 @@ app.post('/', function (req, res) {
             assistant.data.time = T;
             assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
         }
+
+        }  
+        if (T === false) {
+            assistant.ask(R(assistant, NOROOM) + "this day and the week after. You may try another date. ");
+            return;
+        }
+
         if (assistant.data.proposition) {
             assistant.data.state = YES_NO_STATE;
             assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
@@ -217,9 +218,6 @@ app.post('/', function (req, res) {
     }
     
     function choose (assistant) {
-        if (assistant.data.state == WELCOME_STATE) {
-
-        }
     }
 
     function reserve (assistant) {
@@ -239,7 +237,7 @@ app.post('/', function (req, res) {
 
         if (isNaN(assistant.data.places)) {
                 assistant.setContext(CHOOSE_STATE);
-                assistant.data.problem == "I didn't understood the number. "
+                assistant.data.problem == "I didn't understand the number. "
             }
 
         if (datebis == "today") {
@@ -265,7 +263,7 @@ app.post('/', function (req, res) {
 
         if (resto) {
             assistant.data.restaurant = resto.toUpperCase();
-        } else if (!assistant.data.restaurant) {
+        }/* else if (!assistant.data.restaurant) {
             let rand = select(Object.keys(horaires));
             console.log("random restaurant selected : " +rand);
             if (horaires[rand][date] && 0 in horaires[rand][date]){
@@ -275,15 +273,13 @@ app.post('/', function (req, res) {
                 assistant.ask(R(assistant, WHICH_RESTAURANT) );
                 return;
             }
-        }
+        }*/
 
         let restaurant = assistant.data.restaurant;
         console.log(restaurant);
-        let dispo = horaires[restaurant][date];
 
         if (!assistant.data.places) {
             assistant.setContext("asknumber");
-            assistant.ask(R(assistant, HOWMANY) );
             return;
         }
 
@@ -333,6 +329,7 @@ app.post('/', function (req, res) {
     actionMap.set('confirmation', confirmation);
     actionMap.set('yes', yes);
     actionMap.set('no', no);
+
 
 
     assistant.handleRequest(actionMap);
