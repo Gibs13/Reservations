@@ -92,11 +92,9 @@ app.post('/', function (req, res) {
             assistant.data.time = T;
             if (!assistant.data.proposition) {
                 assistant.data.proposition = true;
-
-                let reserve = assistant.getContext('reserve');
-                reserve.parameters.ct = 1;
-                assistant.setContext('reserve',5,reserve.parameters);
                 
+                assistant.data.ct = 1;
+
                 assistant.data.message += R(assistant, NOROOM) + "at this hour. ";
             }
         }
@@ -226,6 +224,11 @@ app.post('/', function (req, res) {
         assistant.data.name = assistant.getArgument('last-name');
         assistant.data.places = parseInt(assistant.getArgument('number'));
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
+        assistant.data.cd = assistant.getArgument('cd');
+        assistant.data.cr = assistant.getArgument('cr');
+        assistant.data.cln = assistant.getArgument('cln');
+        assistant.data.cn = assistant.getArgument('cn');
+        assistant.data.ct = assistant.getArgument('ct');
 
         if (isNaN(assistant.data.places)) {
                 assistant.data.problem = "I didn't understand the number of persons. "
