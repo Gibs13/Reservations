@@ -283,7 +283,6 @@ app.post('/', function (req, res) {
 
             horaires = val;
 
-            console.log(horaires);
         if (!horaires) {
             assistant.ask("I don't know this restaurant. ");
             return;
@@ -294,7 +293,6 @@ app.post('/', function (req, res) {
     }
 
     function async (val, callback) {
-        console.log('value : '+val);
         callback(val);
     } 
 

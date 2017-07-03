@@ -25,6 +25,7 @@ function sheetedit(resto, date, creneau, places, valeur, nom){
   expiry_date: 1499077990040 };
   if (!nom) {
     let horaires = get(resto);
+    console.log('pas horaires :'+ !horaires);
     return horaires;
   } else {
     return callback(resto, date, creneau, places, valeur, nom);
