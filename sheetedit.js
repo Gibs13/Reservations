@@ -58,7 +58,8 @@ function get(resto) {
         let horaires = {};
         for (let i=0; i < rows.length; i++) {
             let row = rows[i];
-            horaires[row[0]] = row.shift().push(i+1);
+            row = row.shift()
+            horaires[row[0]] = row.push(i+1);
         }
         console.log(horaires);
         return horaires;
