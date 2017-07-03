@@ -24,7 +24,8 @@ function sheetedit(resto, date, creneau, places, valeur, nom){
   token_type: 'Bearer',
   expiry_date: 1499077990040 };
   if (!nom) {
-    return get(resto);
+    let horaires = get(resto);
+    return horaires;
   } else {
     return callback(resto, date, creneau, places, valeur, nom);
   }

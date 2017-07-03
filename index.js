@@ -277,17 +277,23 @@ app.post('/', function (req, res) {
         }
 
         let restaurant = assistant.data.restaurant;
-        horaires = sheetedit(restaurant);
-
         console.log(restaurant);
+
+        async(sheetedit(restaurant),function(val) {
+
+            horaires = val;
         if (!horaires) {
             assistant.ask("I don't know this restaurant. ");
             return;
         }
 
         confirmation(assistant);
-
+        });
     }
+
+    function async (val, callback) {
+        callback(val);
+    } 
 
     function yes (assistant) {
         let state = assistant.data.state;
