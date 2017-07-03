@@ -4,7 +4,8 @@ process.env.DEBUG = 'actions-on-google:*';
 let ApiAiApp = require('actions-on-google').ApiAiApp;
 let express = require('express');
 let bodyParser = require('body-parser');
-let horaires = require('./horaires.js');
+let horaires = {};
+let sheetedit = require('./sheetedit.js');
 
 let app = express();
 app.use(bodyParser.json({type: 'application/json'}));
@@ -34,6 +35,7 @@ const NOROOM = ["There is no room ","They haven't got any seats ","It's not poss
 
 const MONTH = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAY = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+
 
 
 // Function Handler
@@ -115,17 +117,19 @@ app.post('/', function (req, res) {
 
     function reserver (assistant) {
         let restaurant = assistant.data.restaurant;
+        horaires = sheetedit(restaurant);
         let date = assistant.data.date;
         let creneau = assistant.data.creneau;
         console.log(restaurant + " " + date + " " + creneau);
-        let placeRestante = parseInt(horaires[restaurant][assistant.data.date][assistant.data.creneau].substring(18));
+        let placeRestante = parseInt(horaires[date][creneau].substring(12));
         let places = assistant.data.places;
-        console.log("reservation à " + horaires[restaurant][date][creneau]);
+        let name = assistant.data.name;
+        console.log("reservation à " + horaires[date][creneau]);
         if (placeRestante-places>=0) {
             console.log("valide");
-            horaires[restaurant][date][creneau] = horaires[restaurant][date][creneau].substring(0,18) + (placeRestante-places).toString();
-            console.log(horaires[restaurant][date][creneau]);
-            assistant.tell(R(assistant, SUCCESS) + assistant.data.name);
+            let valeur = horaires[date][creneau].substring(0,12) + (placeRestante-places).toString();
+            sheetedit(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(65 + creneau),places,valeur,name);
+            assistant.tell(R(assistant, SUCCESS) + name);
         } else {
             console.log("invalide");
             assistant.ask("There was an error, the places are not available anymore. ");
@@ -138,16 +142,19 @@ app.post('/', function (req, res) {
         let max;
         let possibleTime = [];
         let placeRestante;
-        let horairesJour = horaires[assistant.data.restaurant][date];
+        let horairesJour = horaires[date];
         if (isNaN(time)) {
             console.log("Nan");
         }
         if (horairesJour == undefined) {return false;}
         if (horairesJour.length == 0) {return false;}
         for (let i = 0; i<horairesJour.length;i++) {
-            placeRestante = parseInt(horairesJour[i].substring(18));
+            if (!isNaN(horairesJour[i])) {
+                continue;
+            }
+            placeRestante = parseInt(horairesJour[i].substring(12));
             min = parseInt(horairesJour[i].substring(0,2))*60 + parseInt(horairesJour[i].substring(3,5));
-            max = parseInt(horairesJour[i].substring(9,11))*60 + parseInt(horairesJour[i].substring(12,14));
+            max = parseInt(horairesJour[i].substring(6,8))*60 + parseInt(horairesJour[i].substring(9,11));
             
             console.log("min : "+min+" max : "+max+" time : "+time);
 
@@ -155,7 +162,7 @@ app.post('/', function (req, res) {
             // Si oui, assez de place => on revoit une heure acceptable, pas assez => On va annoncer qu'il n'y avait pas assez de place
             // Si non, est ce que le créneau avant ou celui après est disponible 
 
-            if (today.getDate() != parseInt(date.substring(8,10)) && min<=time && time<=max) {
+            if (min<=time && time<=max) {
                 if (placeRestante >= assistant.data.places) {
                     assistant.data.creneau = i;
                     let rightTime;
@@ -270,10 +277,11 @@ app.post('/', function (req, res) {
         }
 
         let restaurant = assistant.data.restaurant;
-        console.log(restaurant);
+        horaires = sheetedit(restaurant);
 
-        if (!assistant.data.places) {
-            assistant.setContext("asknumber");
+        console.log(restaurant);
+        if (!horaires) {
+            assistant.ask("I don't know this restaurant. ");
             return;
         }
 
