@@ -282,6 +282,7 @@ app.post('/', function (req, res) {
         async(sheetedit(restaurant),function(val) {
 
             horaires = val;
+
             console.log(horaires);
         if (!horaires) {
             assistant.ask("I don't know this restaurant. ");
@@ -293,6 +294,7 @@ app.post('/', function (req, res) {
     }
 
     function async (val, callback) {
+        console.log('value : '+val);
         callback(val);
     } 
 
