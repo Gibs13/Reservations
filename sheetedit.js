@@ -24,9 +24,9 @@ function sheetedit(resto, date, creneau, places, valeur, nom){
   token_type: 'Bearer',
   expiry_date: 1499077990040 };
   if (!nom) {
-    let horaires = get(resto);
-    console.log('pas horaires :'+ !horaires);
-    return horaires;
+    
+    console.log('pas horaires :');
+    return get(resto);
   } else {
     return callback(resto, date, creneau, places, valeur, nom);
   }
@@ -64,6 +64,7 @@ function get(resto) {
             row.push(i+1);
             horaires[row.shift()] = row;
         }
+        console.log('horaires pretes');
         return horaires;
     })
 }
