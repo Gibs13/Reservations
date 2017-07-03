@@ -57,14 +57,12 @@ function get(resto) {
         }
         let rows = response.values;
         let row;
-        console.log(rows[0]);
         let horaires = {};
         for (let i=0; i < rows.length; i++) {
             row = rows[i];
             row.push(i+1);
             horaires[row.shift()] = row;
         }
-        console.log(horaires);
         return horaires;
     })
 }
