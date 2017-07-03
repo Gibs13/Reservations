@@ -55,11 +55,13 @@ function get(resto) {
             return;
         }
         let rows = response.values;
-        console.log(rows);
+        let row;
+        console.log(rows[0]);
         let horaires = {};
         for (let i=0; i < rows.length; i++) {
-            let row = rows[i];
+            row = rows[i];
             row = row.shift();
+            console.log(row);
             row.push(i+1);
             horaires[row[0]] = row;
         }
