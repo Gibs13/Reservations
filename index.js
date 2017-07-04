@@ -407,7 +407,7 @@ function modify(resto, date, creneau, places, valeur, nom){
 
     function selectionner (assistant) {
         let r = assistant.getContextArgument('actions_intent_option','OPTION').value;
-        assistant.setContext('propose',1,{"ok":r});
+        assistant.setContext('next',1,{"ok":r});
         assistant.ask("The restaurant "+r.toLowerCase()+" was selected. Please say next to continue. ");
     }
 
