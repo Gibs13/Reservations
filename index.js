@@ -312,8 +312,15 @@ function modify(resto, date, creneau, places, valeur, nom){
 
     function reserve (assistant) {
 
-        console.log(assistant.getContexts());
-        console.log(assistant.getContext('actions_intent_option').toString());
+        
+        let r = assistant.getContextArgument('actions_intent_option','OPTION').value;
+        if (r) {
+            contextReserve = assistant.getContext('reserve');
+            console.log(contextReserve);
+            contextReserve.parameters.resto = r;
+            assistant.setContext('reserve',5,contextReserve.parameters);
+        }
+
         assistant.data.proposition = false;
         assistant.data.message = "";
         assistant.data.problem = false;
