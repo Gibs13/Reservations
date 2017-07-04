@@ -201,7 +201,7 @@ function modify(resto, date, creneau, places, valeur, nom){
             if (placeRestante-places>=0) {
                 console.log("valide");
                 let valeur = horaires[date][creneau].substring(0,12) + (placeRestante-places).toString();
-                modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(65 + creneau),places,valeur,name);
+                modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(66 + creneau),places,valeur,name);
                 assistant.tell(R(assistant, SUCCESS) + name);
             } else {
                 console.log("invalide");
