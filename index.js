@@ -407,8 +407,8 @@ function modify(resto, date, creneau, places, valeur, nom){
 
     function propose(assistant) {
         assistant.askWithList(assistant.buildRichResponse()
-            .addSimpleResponse('Here are some cool restaurants. ')
-            .buildList()
+            .addSimpleResponse('Here are some cool restaurants. '),
+            assistant.buildList()
             .addItem(assistant.buildOptionItem('VELICIOUS',['first one','velicious'])
                 .setTitle('Velicious')
                 .setDescription('Vegan restaurant')
