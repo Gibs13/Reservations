@@ -406,15 +406,9 @@ function modify(resto, date, creneau, places, valeur, nom){
     }
 
     function selectionner (assistant) {
-        console.log('test : ' + assistant.getArgument('test'));
         let r = assistant.getContextArgument('actions_intent_option','OPTION').value;
-        if (r) {
-            let contextReserve = assistant.getContext('reserve');
-            console.log(contextReserve);
-            contextReserve.parameters.resto = r;
-            assistant.setContext('reserve',5,contextReserve.parameters);
-        }
-        assistant.ask("The restaurant "+r+" was selected. Please say next to continue. ");
+        assistant.setContext('reserve',1,{"ok":r});
+        assistant.ask("The restaurant "+r.toLowerCase()+" was selected. Please say next to continue. ");
     }
 
     function propose(assistant) {
