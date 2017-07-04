@@ -412,15 +412,15 @@ function modify(resto, date, creneau, places, valeur, nom){
             .addItems(assistant.buildOptionItem('VELICIOUS',['first one','velicious'])
                 .setTitle('Velicious')
                 .setDescription('Vegan restaurant')
-                .setImage('./images/Velicious','Velicious'))
+                .setImage('https://reservation01.herokuapp.com/images/Velicious.jpg','Velicious'))
             .addItems(assistant.buildOptionItem('AKABE',['second one','akabe'])
                 .setTitle('Akabe')
                 .setDescription('Turkish restaurant')
-                .setImage('./images/Akabe','Akabe'))
+                .setImage('https://reservation01.herokuapp.com/images/Akabe.jpg','Akabe'))
             .addItems(assistant.buildOptionItem('LA CLOCHE A FROMAGE',['third one','la cloche a fromage'])
                 .setTitle('La cloche à fromage')
                 .setDescription('Cheese restaurant')
-                .setImage('./images/La_cloche_a_fromage','La cloche à fromage'))
+                .setImage('https://reservation01.herokuapp.com/images/La_cloche_a_fromage.jpg','La cloche à fromage'))
         )
     }
 
