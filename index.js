@@ -223,7 +223,7 @@ function modify(resto, date, creneau, places, valeur, nom){
             console.log("Nan");
         }
         if (horairesJour == undefined) {return false;}
-        if (horairesJour.length == 0) {return false;}
+        if (horairesJour.length <= 1) {return false;}
         for (let i = 0; i<horairesJour.length;i++) {
             if (!isNaN(horairesJour[i])) {
                 continue;
