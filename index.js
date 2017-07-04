@@ -312,6 +312,8 @@ function modify(resto, date, creneau, places, valeur, nom){
 
     function reserve (assistant) {
 
+        console.log(assistant.getContexts());
+        console.log(assistant.getContext('actions_intent_option').toString());
         assistant.data.proposition = false;
         assistant.data.message = "";
         assistant.data.problem = false;
