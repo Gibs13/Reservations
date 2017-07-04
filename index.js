@@ -406,18 +406,18 @@ function modify(resto, date, creneau, places, valeur, nom){
     }
 
     function propose(assistant) {
-        app.askWithList(app.buildRichResponse()
+        assistant.askWithList(assistant.buildRichResponse()
             .addSimpleResponse('Here are some cool restaurants. ')
             .buildList()
-            .addItem(app.buildOptionItem('VELICIOUS',['first one','velicious'])
+            .addItem(assistant.buildOptionItem('VELICIOUS',['first one','velicious'])
                 .setTitle('Velicious')
                 .setDescription('Vegan restaurant')
                 .setImage('./images/Velicious','Velicious'))
-            .addItem(app.buildOptionItem('AKABE',['second one','akabe'])
+            .addItem(assistant.buildOptionItem('AKABE',['second one','akabe'])
                 .setTitle('Akabe')
                 .setDescription('Turkish restaurant')
                 .setImage('./images/Akabe','Akabe'))
-            .addItem(app.buildOptionItem('LA CLOCHE A FROMAGE',['third one','la cloche a fromage'])
+            .addItem(assistant.buildOptionItem('LA CLOCHE A FROMAGE',['third one','la cloche a fromage'])
                 .setTitle('La cloche à fromage')
                 .setDescription('Cheese restaurant')
                 .setImage('./images/La_cloche_a_fromage','La cloche à fromage'))
