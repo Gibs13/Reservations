@@ -82,7 +82,7 @@ app.post('/', function (req, res) {
         callback();
         });*/
 
-function get(resto) {
+function get(resto, callback) {
     sheets.spreadsheets.values.get({
         auth: oauth2Client,
         spreadsheetId: '1DnlKFhV0vNPJ-vQrixpocbcXRlHL5xKJxx5h7IF_qEc',
@@ -102,7 +102,7 @@ function get(resto) {
             horaires[row.shift()] = row;
         }
         console.log('horaires pretes');
-        return horaires;
+        callback(horaires);
     })
 }
 
@@ -193,24 +193,24 @@ function modify(resto, date, creneau, places, valeur, nom){
 
     function reserver (assistant) {
         let restaurant = assistant.data.restaurant;
-        horaires = get(restaurant);
+        horaires = get(restaurant, function(horaires) {
+            let placeRestante = parseInt(horaires[date][creneau].substring(12));
+            let places = assistant.data.places;
+            let name = assistant.data.name;
+            console.log("reservation à " + horaires[date][creneau]);
+            if (placeRestante-places>=0) {
+                console.log("valide");
+                let valeur = horaires[date][creneau].substring(0,12) + (placeRestante-places).toString();
+                modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(65 + creneau),places,valeur,name);
+                assistant.tell(R(assistant, SUCCESS) + name);
+            } else {
+                console.log("invalide");
+                assistant.ask("There was an error, the places are not available anymore. ");
+            }
+        });
         let date = assistant.data.date;
         let creneau = assistant.data.creneau;
         console.log(restaurant + " " + date + " " + creneau);
-        let placeRestante = parseInt(horaires[date][creneau].substring(12));
-        let places = assistant.data.places;
-        let name = assistant.data.name;
-        console.log("reservation à " + horaires[date][creneau]);
-        if (placeRestante-places>=0) {
-            console.log("valide");
-            let valeur = horaires[date][creneau].substring(0,12) + (placeRestante-places).toString();
-            modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(65 + creneau),places,valeur,name);
-            assistant.tell(R(assistant, SUCCESS) + name);
-        } else {
-            console.log("invalide");
-            assistant.ask("There was an error, the places are not available anymore. ");
-        }
-    
     }
 
     function disponible(date, time) {
@@ -330,7 +330,7 @@ function modify(resto, date, creneau, places, valeur, nom){
         let restaurant = assistant.data.restaurant;
         console.log(restaurant);
 
-        async(get(restaurant),function(val) {
+        get(restaurant,function(val) {
 
             horaires = val;
 
@@ -366,13 +366,7 @@ function modify(resto, date, creneau, places, valeur, nom){
                 assistant.data.time = "12:30";
             }
         }
-
-        
     }
-
-    function async (val, callback) {
-        callback(val);
-    } 
 
     function yes (assistant) {
         let state = assistant.data.state;
