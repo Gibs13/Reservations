@@ -13,6 +13,7 @@ var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
 let app = express();
 app.use(bodyParser.json({type: 'application/json'}));
+app.use('/images', express.static('images'));
 
 let sprintf = require('sprintf-js').sprintf;
 
@@ -404,6 +405,25 @@ function modify(resto, date, creneau, places, valeur, nom){
         assistant.tell(R(assistant, BYE));
     }
 
+    function propose(assistant) {
+        app.askWithList(app.buildRichResponse()
+            .addSimpleResponse('Here are some cool restaurants. ')
+            .buildList()
+            .addItem(app.buildOptionItem('VELICIOUS',['first one','velicious'])
+                .setTitle('Velicious')
+                .setDescription('Vegan restaurant')
+                .setImage('./images/Velicious','Velicious'))
+            .addItem(app.buildOptionItem('AKABE',['second one','akabe'])
+                .setTitle('Akabe')
+                .setDescription('Turkish restaurant')
+                .setImage('./images/Akabe','Akabe'))
+            .addItem(app.buildOptionItem('LA CLOCHE A FROMAGE',['third one','la cloche a fromage'])
+                .setTitle('La cloche à fromage')
+                .setDescription('Cheese restaurant')
+                .setImage('./images/La_cloche_a_fromage','La cloche à fromage'))
+        )
+    }
+
 
     // Mapping intentions
 
@@ -414,6 +434,7 @@ function modify(resto, date, creneau, places, valeur, nom){
     actionMap.set('quit', quit);
     actionMap.set('yes', yes);
     actionMap.set('no', no);
+    actionMap.set('propose',propose);
 
 
 
