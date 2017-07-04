@@ -312,15 +312,6 @@ function modify(resto, date, creneau, places, valeur, nom){
 
     function reserve (assistant) {
 
-        
-        let r = assistant.getContextArgument('actions_intent_option','OPTION').value;
-        if (r) {
-            contextReserve = assistant.getContext('reserve');
-            console.log(contextReserve);
-            contextReserve.parameters.resto = r;
-            assistant.setContext('reserve',5,contextReserve.parameters);
-        }
-
         assistant.data.proposition = false;
         assistant.data.message = "";
         assistant.data.problem = false;
@@ -414,6 +405,18 @@ function modify(resto, date, creneau, places, valeur, nom){
         assistant.tell(R(assistant, BYE));
     }
 
+    function selectionner (assistant) {
+        console.log('test : ' + assistant.getArgument('test'));
+        let r = assistant.getContextArgument('actions_intent_option','OPTION').value;
+        if (r) {
+            let contextReserve = assistant.getContext('reserve');
+            console.log(contextReserve);
+            contextReserve.parameters.resto = r;
+            assistant.setContext('reserve',5,contextReserve.parameters);
+        }
+        assistant.ask("The restaurant "+r+" was selected. Please say next to continue. ");
+    }
+
     function propose(assistant) {
         assistant.askWithList(assistant.buildRichResponse()
             .addSimpleResponse('Here are some cool restaurants. '),
@@ -444,6 +447,7 @@ function modify(resto, date, creneau, places, valeur, nom){
     actionMap.set('yes', yes);
     actionMap.set('no', no);
     actionMap.set('propose',propose);
+    actionMap.set('selectionner',selectionner)
 
 
 
