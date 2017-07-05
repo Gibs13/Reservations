@@ -462,6 +462,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         for (let i =0;i<=10000;i++) {
             if (i == 10000) {console.log("finished");}
         }
+        assistant.ask("Okay it's fine");
     }
 
     // Mapping intentions
