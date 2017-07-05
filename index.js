@@ -107,23 +107,41 @@ function get(resto, callback) {
     })
 }
 
-function modify(resto, date, creneau, places, valeur, nom){
+function modify(resto, date, creneau, places, valeur, nom, time){
   sheets.spreadsheets.values.batchUpdate({
     auth: oauth2Client,
     spreadsheetId: '1DnlKFhV0vNPJ-vQrixpocbcXRlHL5xKJxx5h7IF_qEc',
     resource: {
       valueInputOption: "RAW",
-      data: [{range: resto + '!' + creneau + date,
-      values: [
-      [valeur]]
-  }]}
-}, function(err, response) {
-  console.log(response);
-    if (err) {
-      console.log('The API returned an error: ' + err);
-      return;
-    }
+      data: [{range: resto + '!' + String.fromCharCode(66 + creneau) + horaires[date][horaires[date].length-1],
+        values: [
+            [valeur]]
+        }
+  ]}
+    }, function(err, response) {
+        console.log(response);
+        if (err) {
+            console.log('The API returned an error: ' + err);
+            return;
+        }
   });
+  sheets.spreadsheets.values.append({
+    auth: oauth2Client,
+    spreadsheetId: '1DnlKFhV0vNPJ-vQrixpocbcXRlHL5xKJxx5h7IF_qEc',
+    range: "Reservations",
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS",
+    resource: {
+        values: [
+            [resto + date + time + places + nom]]
+        }
+    }, function(err, response){
+        if (err) {
+            console.log('The API returned an error: ' + err);
+            return;
+        }
+    }
+  );
 }
 
 
@@ -202,7 +220,7 @@ function modify(resto, date, creneau, places, valeur, nom){
             if (placeRestante-places>=0) {
                 console.log("valide");
                 let valeur = horaires[date][creneau].substring(0,12) + (placeRestante-places).toString();
-                modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(66 + creneau),places,valeur,name);
+                modify(restaurant,date,creneau,places,valeur,name,assistant.data.time);
                 assistant.tell(R(assistant, SUCCESS) + name);
             } else {
                 console.log("invalide");
@@ -358,11 +376,20 @@ function modify(resto, date, creneau, places, valeur, nom){
         
         if (timebis && !isNaN(parseInt(timebis))) {
             assistant.data.time = timebis.substring(0,5);
+        } else if (timebis && isNaN(parseInt(timebis))){
+            let t = timebis.toUpperCase();
+            if (t.includes("MORNING")) {
+                assistant.data.time = "8:00";
+            } else if (t.includes("EVENING")) {
+                assistant.data.time = "18:00";
+            } else if (t.includes("NIGHT")) {
+                assistant.data.time = "21:00";
+            }
         } else {
             assistant.data.proposition = true;
             assistant.data.ct = 1;
             if (date == todayNormalized) {
-                assistant.data.time = ('0' + (today.getHours()+2+(today.getMinutes()+20>60?1:0)).toString()).slice(-2) + ":" + ('0' + (today.getMinutes()+20-Math.floor((today.getMinutes()+20)/60)*60).toString()).slice(-2);
+                assistant.data.time = ('0' + (today.getHours()+2+(today.getMinutes()+45>60?1:0)).toString()).slice(-2) + ":" + ('0' + (~~((today.getMinutes()+45-~~((today.getMinutes()+45)/60)*60)/10)*10).toString()).slice(-2);
             } else {
                 assistant.data.time = "12:30";
             }
