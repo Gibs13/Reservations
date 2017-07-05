@@ -133,7 +133,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     insertDataOption: "INSERT_ROWS",
     resource: {
         values: [
-            [resto + assistant.data.date + time + places + nom]]
+            [resto + " " + assistant.data.date + " " + time + " " + places + " " + nom]]
         }
     }, function(err, response){
         if (err) {
