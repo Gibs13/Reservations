@@ -213,13 +213,13 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     function reserver (assistant) {
         let restaurant = assistant.data.restaurant;
         get(restaurant, function(horaires) {
-            let placeRestante = parseInt(horaires[date][creneau].substring(12));
+            let placeRestante = parseInt(horaires[date][creneau].substring(6));
             let places = assistant.data.places;
             let name = assistant.data.name;
             console.log("reservation à " + horaires[date][creneau]);
             if (placeRestante-places>=0) {
                 console.log("valide");
-                let valeur = horaires[date][creneau].substring(0,12) + (placeRestante-places).toString();
+                let valeur = horaires[date][creneau].substring(0,6) + (placeRestante-places).toString();
                 modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(66 + creneau),places,valeur,name,assistant.data.time);
                 assistant.tell(R(assistant, SUCCESS) + name);
             } else {
@@ -233,8 +233,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     }
 
     function disponible(date, time) {
-        let min;
-        let max;
+        let heure;
         let possibleTime = [];
         let placeRestante;
         let horairesJour = horaires[date];
@@ -247,31 +246,26 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             if (!isNaN(horairesJour[i])) {
                 continue;
             }
-            placeRestante = parseInt(horairesJour[i].substring(12));
-            min = parseInt(horairesJour[i].substring(0,2))*60 + parseInt(horairesJour[i].substring(3,5));
-            max = parseInt(horairesJour[i].substring(6,8))*60 + parseInt(horairesJour[i].substring(9,11));
+            placeRestante = parseInt(horairesJour[i].substring(6));
+            heure = parseInt(horairesJour[i].substring(0,2))*60 + parseInt(horairesJour[i].substring(3,5));
             
-            console.log("min : "+min+" max : "+max+" time : "+time);
+            console.log("heure : "+heure+"time : "+time);
 
             // Teste si le créneau est bon
             // Si oui, assez de place => on revoit une heure acceptable, pas assez => On va annoncer qu'il n'y avait pas assez de place
             // Si non, est ce que le créneau avant ou celui après est disponible 
 
-            if (min<=time && time<=max) {
+            if (heure<=time && time<=heure+30) {
                 if (placeRestante >= assistant.data.places) {
                     assistant.data.creneau = i;
                     let rightTime;
-                    if (max-time < 40) {
+                    if (time != heure) {
                         if (!assistant.data.proposition) {
                             assistant.data.message += "You can only order a bit earlier. ";
                         }
-                        assistant.data.ct = 1;
-                        rightTime = max-40;
-                    } else {
-                        rightTime = time;
+                        rightTime = heure;
                     } 
                     console.log("rightTime : " + rightTime);
-                    console.log(('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2));
                     return ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
                 } else {
                     if (!assistant.data.proposition) {
@@ -281,11 +275,11 @@ function modify(resto, date, creneau, places, valeur, nom, time){
                     }
                 }
             } else if (placeRestante >= assistant.data.places) {
-                if (time>max && today.getDate() != parseInt(date.substring(8,10) )) {
-                    possibleTime[0] = max-40;
+                if (time>heure && today.getDate() != parseInt(date.substring(8,10) )) {
+                    possibleTime[0] = heure;
                     possibleTime[2] = i;
-                } else if (time<min && possibleTime[1] == undefined) {
-                    possibleTime[1] = min;
+                } else if (time<heure && possibleTime[1] == undefined) {
+                    possibleTime[1] = heure;
                     possibleTime[3] = i;
                 }
             }
@@ -301,10 +295,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
         }
         assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
-        if (!assistant.data.proposition && Math.abs(rightTime - time) > 15) {
-            assistant.data.proposition = true;
-            assistant.data.ct = 1;
-        }
+        assistant.data.ct = 1;
         let answer = ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
         console.log("temps proposé : " + answer);
         return answer;
@@ -457,14 +448,6 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         )
     }
 
-    function test(assistant) {
-        assistant.ask("Wait a minute");
-        for (let i =0;i<=10000;i++) {
-            if (i == 10000) {console.log("finished");}
-        }
-        assistant.ask("Okay it's fine");
-    }
-
     // Mapping intentions
 
     let actionMap = new Map();
@@ -476,7 +459,6 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     actionMap.set('no', no);
     actionMap.set('propose',propose);
     actionMap.set('selectionner',selectionner)
-    actionMap.set('test',test)
 
 
 
