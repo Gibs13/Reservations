@@ -457,6 +457,12 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         )
     }
 
+    function test(assistant) {
+        assistant.ask("Wait a minute");
+        for (let i =0;i<=10000;i++) {
+            if (i == 10000) {console.log("finished");}
+        }
+    }
 
     // Mapping intentions
 
@@ -469,6 +475,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     actionMap.set('no', no);
     actionMap.set('propose',propose);
     actionMap.set('selectionner',selectionner)
+    actionMap.set('test',test)
 
 
 
