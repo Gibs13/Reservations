@@ -113,7 +113,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     spreadsheetId: '1DnlKFhV0vNPJ-vQrixpocbcXRlHL5xKJxx5h7IF_qEc',
     resource: {
       valueInputOption: "RAW",
-      data: [{range: resto + '!' + String.fromCharCode(66 + creneau) + horaires[date][horaires[date].length-1],
+      data: [{range: resto + '!' + creneau + date,
         values: [
             [valeur]]
         }
@@ -133,7 +133,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     insertDataOption: "INSERT_ROWS",
     resource: {
         values: [
-            [resto + date + time + places + nom]]
+            [resto + assistant.data.date + time + places + nom]]
         }
     }, function(err, response){
         if (err) {
@@ -207,12 +207,12 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         let cln = assistant.data.cln;
         let cn = assistant.data.cn;
         let ct = assistant.data.ct;
-        return (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant+" ":"")+(cd?"on "+assistant.data.date.substring(5)+" ":"")+(ct?"at "+assistant.data.time+" ":"")+(cln?"with the name "+assistant.data.name+" ":"")+". ";
+        return (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant.toLowerCase()+" ":"")+(cd?"on "+assistant.data.date.substring(5)+" ":"")+(ct?"at "+assistant.data.time+" ":"")+(cln?"with the name "+assistant.data.name+" ":"")+". ";
     }
 
     function reserver (assistant) {
         let restaurant = assistant.data.restaurant;
-        horaires = get(restaurant, function(horaires) {
+        get(restaurant, function(horaires) {
             let placeRestante = parseInt(horaires[date][creneau].substring(12));
             let places = assistant.data.places;
             let name = assistant.data.name;
@@ -220,7 +220,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             if (placeRestante-places>=0) {
                 console.log("valide");
                 let valeur = horaires[date][creneau].substring(0,12) + (placeRestante-places).toString();
-                modify(restaurant,date,creneau,places,valeur,name,assistant.data.time);
+                modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(66 + creneau),places,valeur,name,assistant.data.time);
                 assistant.tell(R(assistant, SUCCESS) + name);
             } else {
                 console.log("invalide");
