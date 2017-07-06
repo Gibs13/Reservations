@@ -326,18 +326,18 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         assistant.data.message = "";
         assistant.data.problem = false;
         assistant.data.state = RESERVE_STATE;
-        console.log(assistant.getContextArgument('reserve','parameters'));
-        assistant.data.restaurant = assistant.getContextArgument('reserve','resto').toUpperCase();
-        let datebis = assistant.getContextArgument('reserve','datebis');
-        let timebis = assistant.getContextArgument('reserve','timebis');
-        assistant.data.name = assistant.getContextArgument('reserve','last-name');
-        assistant.data.places = parseInt(assistant.getContextArgument('reserve','number'));
+        
+        assistant.data.restaurant = assistant.getContextArgument('reserve','resto').value.toUpperCase();
+        let datebis = assistant.getContextArgument('reserve','datebis').value;
+        let timebis = assistant.getContextArgument('reserve','timebis').value;
+        assistant.data.name = assistant.getContextArgument('reserve','last-name').value;
+        assistant.data.places = parseInt(assistant.getContextArgument('reserve','number').value);
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
-        assistant.data.cd = assistant.getContextArgument('reserve','cd');
-        assistant.data.cr = assistant.getContextArgument('reserve','cr');
-        assistant.data.cln = assistant.getContextArgument('reserve','cln');
-        assistant.data.cn = assistant.getContextArgument('reserve','cn');
-        assistant.data.ct = assistant.getContextArgument('reserve','ct');
+        assistant.data.cd = assistant.getContextArgument('reserve','cd').value;
+        assistant.data.cr = assistant.getContextArgument('reserve','cr').value;
+        assistant.data.cln = assistant.getContextArgument('reserve','cln').value;
+        assistant.data.cn = assistant.getContextArgument('reserve','cn').value;
+        assistant.data.ct = assistant.getContextArgument('reserve','ct').value;
 
         let restaurant = assistant.data.restaurant;
         console.log(restaurant);
