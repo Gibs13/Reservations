@@ -327,16 +327,16 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         assistant.data.problem = false;
         assistant.data.state = RESERVE_STATE;
         assistant.data.restaurant = assistant.getContextArgument('reserve','resto').toUpperCase();
-        let datebis = assistant.getArgument('reserve','datebis');
-        let timebis = assistant.getArgument('reserve','timebis');
-        assistant.data.name = assistant.getArgument('reserve','last-name');
-        assistant.data.places = parseInt(assistant.getArgument('reserve','number'));
+        let datebis = assistant.getContextArgument('reserve','datebis');
+        let timebis = assistant.getContextArgument('reserve','timebis');
+        assistant.data.name = assistant.getContextArgument('reserve','last-name');
+        assistant.data.places = parseInt(assistant.getContextArgument('reserve','number'));
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
-        assistant.data.cd = assistant.getArgument('reserve','cd');
-        assistant.data.cr = assistant.getArgument('reserve','cr');
-        assistant.data.cln = assistant.getArgument('reserve','cln');
-        assistant.data.cn = assistant.getArgument('reserve','cn');
-        assistant.data.ct = assistant.getArgument('reserve','ct');
+        assistant.data.cd = assistant.getContextArgument('reserve','cd');
+        assistant.data.cr = assistant.getContextArgument('reserve','cr');
+        assistant.data.cln = assistant.getContextArgument('reserve','cln');
+        assistant.data.cn = assistant.getContextArgument('reserve','cn');
+        assistant.data.ct = assistant.getContextArgument('reserve','ct');
 
         let restaurant = assistant.data.restaurant;
         console.log(restaurant);
@@ -410,8 +410,9 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     }
 
     function selectionner (assistant) {
+        assistant.data.state = RESERVE_STATE;
         let r = assistant.getContextArgument('actions_intent_option','OPTION').value;
-        assistant.setContext('next',1,{"ok":r});
+        assistant.setContext('next',5,{"ok":r});
         assistant.ask("The restaurant "+r.toLowerCase()+" was selected. Please say next to continue. ");
     }
 
