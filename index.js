@@ -39,7 +39,7 @@ const AGREE = ["Do you agree ? ","Is it ok for you ? ","Is it alright ? "];
 const FINISH = ["May I place an order ? ","Is everything right ? ","May I proceed ? "];
 const READY = ["A table is available ","There's still place ","It's possible to reserve "];
 const SUCCESS = ["Your reservation was completed under the name of ","Everything went well. The table was ordered with the name ","The order was made under the name : "];
-const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. ","Hello ! I'm able to get a reservation for a restaurant in Strasbourg. ","Howdy ! Do you want a reservation in a Strasbourg's restaurant ? "];
+const WELCOME = ["Welcome ! You can book a restaurant's table in Strasbourg. ","Hello ! I'm able to get a reservation for a restaurant in Strasbourg. ","Howdy ! Do you want a reservation in a Strasbourg's restaurant ? "];
 const BYE = ["Alright then, come back soon ! ","Well, goodbye. See you soon.","You're leaving yet ? Until next time !"];
 const CHANGE = ["What should I change ? ","Tell me what has to be modified. ","What has to be replaced ? "];
 const NOROOM = ["There is no room ","They haven't got any seats ","It's not possible to order "];
@@ -264,8 +264,8 @@ function modify(resto, date, creneau, places, valeur, nom, time){
                         if (!assistant.data.proposition) {
                             assistant.data.message += "You can only order a bit earlier. ";
                         }
-                        rightTime = heure;
                     } 
+                    rightTime = heure;
                     console.log("rightTime : " + rightTime);
                     return ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
                 } else {
@@ -368,23 +368,8 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         
         if (timebis && !isNaN(parseInt(timebis))) {
             assistant.data.time = timebis.substring(0,5);
-        } else if (timebis && isNaN(parseInt(timebis))){
-            let t = timebis.toUpperCase();
-            if (t.includes("MORNING")) {
-                assistant.data.time = "8:00";
-            } else if (t.includes("EVENING")) {
-                assistant.data.time = "18:00";
-            } else if (t.includes("NIGHT")) {
-                assistant.data.time = "21:00";
-            }
         } else {
-            assistant.data.proposition = true;
-            assistant.data.ct = 1;
-            if (date == todayNormalized) {
-                assistant.data.time = ('0' + (today.getHours()+2+(today.getMinutes()+45>60?1:0)).toString()).slice(-2) + ":" + ('0' + (~~((today.getMinutes()+45-~~((today.getMinutes()+45)/60)*60)/10)*10).toString()).slice(-2);
-            } else {
-                assistant.data.time = "12:30";
-            }
+            assistant.data.problem = "At what time you wanted to reserve ? ";
         }
     }
 
