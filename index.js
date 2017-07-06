@@ -326,17 +326,17 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         assistant.data.message = "";
         assistant.data.problem = false;
         assistant.data.state = RESERVE_STATE;
-        assistant.data.restaurant = assistant.getArgument('resto').toUpperCase();
-        let datebis = assistant.getArgument('datebis');
-        let timebis = assistant.getArgument('timebis');
-        assistant.data.name = assistant.getArgument('last-name');
-        assistant.data.places = parseInt(assistant.getArgument('number'));
+        assistant.data.restaurant = assistant.getContextArgument('reserve','resto').toUpperCase();
+        let datebis = assistant.getArgument('reserve','datebis');
+        let timebis = assistant.getArgument('reserve','timebis');
+        assistant.data.name = assistant.getArgument('reserve','last-name');
+        assistant.data.places = parseInt(assistant.getArgument('reserve','number'));
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
-        assistant.data.cd = assistant.getArgument('cd');
-        assistant.data.cr = assistant.getArgument('cr');
-        assistant.data.cln = assistant.getArgument('cln');
-        assistant.data.cn = assistant.getArgument('cn');
-        assistant.data.ct = assistant.getArgument('ct');
+        assistant.data.cd = assistant.getArgument('reserve','cd');
+        assistant.data.cr = assistant.getArgument('reserve','cr');
+        assistant.data.cln = assistant.getArgument('reserve','cln');
+        assistant.data.cn = assistant.getArgument('reserve','cn');
+        assistant.data.ct = assistant.getArgument('reserve','ct');
 
         let restaurant = assistant.data.restaurant;
         console.log(restaurant);
@@ -416,8 +416,8 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     }
 
     function propose(assistant) {
-        let restaurants = ['VELICIOUS','AKABE','LA CLOCHE A FROMAGE']
-        let prompt = 'Here are some cool restaurants. '+descriptions[restaurants[0]][0]+'. '+descriptions[restaurants[0]][1]+descriptions[restaurants[1]][0]+'. '+descriptions[restaurants[1]][1]+descriptions[restaurants[2]][0]+'. '+descriptions[restaurants[2]][1]+'.'
+        let restaurants = ['VELICIOUS','AKABE','LA CLOCHE A FROMAGE'];
+        let prompt = 'Here are some cool restaurants. ';
         if (assistant.hasSurfaceCapability(assistant.SurfaceCapabilities.SCREEN_OUTPUT)) {
         assistant.askWithList(assistant.buildRichResponse()
             .addSimpleResponse(prompt),
@@ -425,18 +425,18 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             .addItems(assistant.buildOptionItem(restaurants[0],['first one',descriptions[restaurants[0]][0]])
                 .setTitle(descriptions[restaurants[0]][0])
                 .setDescription(descriptions[restaurants[0]][1])
-                .setImage(IMAGE+descriptions[restaurants[0]][3],descriptions[restaurants[0]][0]))
+                .setImage(IMAGE+descriptions[restaurants[0]][2],descriptions[restaurants[0]][0]))
             .addItems(assistant.buildOptionItem(restaurants[1],['second one',descriptions[restaurants[1]][0]])
                 .setTitle(descriptions[restaurants[1]][0])
                 .setDescription(descriptions[restaurants[1]][1])
-                .setImage(IMAGE+descriptions[restaurants[1]][3],descriptions[restaurants[1]][0]))
+                .setImage(IMAGE+descriptions[restaurants[1]][2],descriptions[restaurants[1]][0]))
             .addItems(assistant.buildOptionItem(restaurants[2],['third one',descriptions[restaurants[2]][0]])
                 .setTitle(descriptions[restaurants[2]][0])
                 .setDescription(descriptions[restaurants[2]][1])
                 .setImage(IMAGE+descriptions[restaurants[2]][2],descriptions[restaurants[2]][0]))
         )}
         else {
-            assistant.ask(prompt);
+            assistant.ask(prompt+descriptions[restaurants[0]][0]+'. '+descriptions[restaurants[0]][1]+descriptions[restaurants[1]][0]+'. '+descriptions[restaurants[1]][1]+descriptions[restaurants[2]][0]+'. '+descriptions[restaurants[2]][1]+'.');
         }
     }
 
