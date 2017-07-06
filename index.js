@@ -326,6 +326,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         assistant.data.message = "";
         assistant.data.problem = false;
         assistant.data.state = RESERVE_STATE;
+        console.log(assistant.getContextArgument('reserve','parameters'));
         assistant.data.restaurant = assistant.getContextArgument('reserve','resto').toUpperCase();
         let datebis = assistant.getContextArgument('reserve','datebis');
         let timebis = assistant.getContextArgument('reserve','timebis');
