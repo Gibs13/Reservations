@@ -219,6 +219,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             let name = assistant.data.name;
             console.log("reservation à " + horaires[date][creneau]);
             if (placeRestante-places>=0) {
+                assistant.setContext('reserve', 0);
                 console.log("valide");
                 let valeur = horaires[date][creneau].substring(0,6) + (placeRestante-places).toString();
                 modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(66 + creneau),places,valeur,name,assistant.data.time);
