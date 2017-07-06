@@ -10,6 +10,7 @@ var google = require('googleapis');
 var googleAuth = require('google-auth-library');
 var sheets = google.sheets('v4');
 var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+let descriptions = require('./descriptions.js');
 
 let app = express();
 app.use(bodyParser.json({type: 'application/json'}));
@@ -36,16 +37,16 @@ const PROPOSITION = ["My suggestion is ","I may suggest you ","A possible choice
 const MISUNDERSTAND = ["Sorry, I didn't understand. ","What did you just said ? ","I didn't heared well. "];
 const AGREE = ["Do you agree ? ","Is it ok for you ? ","Is it alright ? "];
 const FINISH = ["May I place an order ? ","Is everything right ? ","May I proceed ? "];
-const READY = ["A table is available ","There's still place ","It's possible to reserve"];
+const READY = ["A table is available ","There's still place ","It's possible to reserve "];
 const SUCCESS = ["Your reservation was completed under the name of ","Everything went well. The table was ordered with the name ","The order was made under the name : "];
 const WELCOME = ["Welcome ! You can order a restaurant in Strasbourg. ","Hello ! I'm able to get a reservation for a restaurant in Strasbourg. ","Howdy ! Do you want a reservation in a Strasbourg's restaurant ? "];
 const BYE = ["Alright then, come back soon ! ","Well, goodbye. See you soon.","You're leaving yet ? Until next time !"];
-const CHANGE = ["What should I change ? ","Tell me what hes to be modified. ","What has to be replaced ? "];
+const CHANGE = ["What should I change ? ","Tell me what has to be modified. ","What has to be replaced ? "];
 const NOROOM = ["There is no room ","They haven't got any seats ","It's not possible to order "];
 
 const MONTH = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAY = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-
+const IMAGE = 'https://reservation01.herokuapp.com/images/'
 
 
 // Function Handler
@@ -255,7 +256,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             // Si oui, assez de place => on revoit une heure acceptable, pas assez => On va annoncer qu'il n'y avait pas assez de place
             // Si non, est ce que le créneau avant ou celui après est disponible 
 
-            if (heure<=time && time<=heure+30) {
+            if (heure<=time && time<heure+30) {
                 if (placeRestante >= assistant.data.places) {
                     assistant.data.creneau = i;
                     let rightTime;
@@ -269,12 +270,12 @@ function modify(resto, date, creneau, places, valeur, nom, time){
                     return ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
                 } else {
                     if (!assistant.data.proposition) {
-                        assistant.data.message += "There's only "+placeRestante+" places at this hour. ";
+                        assistant.data.message += "There's only "+placeRestante+" seats at this hour. ";
                         assistant.data.proposition = true;
                         assistant.data.ct = 1;
                     }
                 }
-            } else if (placeRestante >= assistant.data.places) {
+            } else if (placeRestante >= assistant.data.places ) {
                 if (time>heure && today.getDate() != parseInt(date.substring(8,10) )) {
                     possibleTime[0] = heure;
                     possibleTime[2] = i;
@@ -287,9 +288,9 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         let rightTime;
         if (possibleTime == []) {
             return false;
-        } else if (!possibleTime[0]) {
+        } else if (!possibleTime[0] || assistant.data.timing==2) {
             rightTime = possibleTime[1];
-        } else if (!possibleTime[1]) {
+        } else if (!possibleTime[1] || assistant.data.timing==1) {
             rightTime = possibleTime[0];
         } else {
             rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
@@ -391,7 +392,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         let state = assistant.data.state;
         if (state == WELCOME_STATE) {
             assistant.data.state = RESERVE_STATE;
-            assistant.ask("Choose your restaurant. ")
+            assistant.ask("What do you want to do ? ")
             return;
         } else
         if (state == YES_NO_STATE) {
@@ -430,22 +431,28 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     }
 
     function propose(assistant) {
+        let restaurants = ['VELICIOUS','AKABE','LA CLOCHE A FROMAGE']
+        let prompt = 'Here are some cool restaurants. '+descriptions[restaurants[0]][0]+'. '+descriptions[restaurants[0]][1]+descriptions[restaurants[1]][0]+'. '+descriptions[restaurants[1]][1]+descriptions[restaurants[2]][0]+'. '+descriptions[restaurants[2]][1]+'.'
+        if (assistant.hasSurfaceCapability(assistant.SurfaceCapabilities.SCREEN_OUTPUT)) {
         assistant.askWithList(assistant.buildRichResponse()
-            .addSimpleResponse('Here are some cool restaurants. '),
+            .addSimpleResponse(prompt),
             assistant.buildList()
-            .addItems(assistant.buildOptionItem('VELICIOUS',['first one','velicious'])
-                .setTitle('Velicious')
-                .setDescription('Vegan restaurant')
-                .setImage('https://reservation01.herokuapp.com/images/Velicious.jpg','Velicious'))
-            .addItems(assistant.buildOptionItem('AKABE',['second one','akabe'])
-                .setTitle('Akabe')
-                .setDescription('Turkish restaurant')
-                .setImage('https://reservation01.herokuapp.com/images/Akabe.jpg','Akabe'))
-            .addItems(assistant.buildOptionItem('LA CLOCHE A FROMAGE',['third one','la cloche a fromage'])
-                .setTitle('La cloche à fromage')
-                .setDescription('Cheese restaurant')
-                .setImage('https://reservation01.herokuapp.com/images/La_cloche_a_fromage.jpg','La cloche à fromage'))
-        )
+            .addItems(assistant.buildOptionItem(restaurants[0],['first one',descriptions[restaurants[0]][0]])
+                .setTitle(descriptions[restaurants[0]][0])
+                .setDescription(descriptions[restaurants[0]][1])
+                .setImage(IMAGE+descriptions[restaurants[0]][3],descriptions[restaurants[0]][0]))
+            .addItems(assistant.buildOptionItem(restaurants[1],['second one',descriptions[restaurants[1]][0]])
+                .setTitle(descriptions[restaurants[1]][0])
+                .setDescription(descriptions[restaurants[1]][1])
+                .setImage(IMAGE+descriptions[restaurants[1]][3],descriptions[restaurants[1]][0]))
+            .addItems(assistant.buildOptionItem(restaurants[2],['third one',descriptions[restaurants[2]][0]])
+                .setTitle(descriptions[restaurants[2]][0])
+                .setDescription(descriptions[restaurants[2]][1])
+                .setImage(IMAGE+descriptions[restaurants[2]][2],descriptions[restaurants[2]][0]))
+        )}
+        else {
+            assistant.ask(prompt);
+        }
     }
 
     // Mapping intentions
@@ -458,8 +465,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     actionMap.set('yes', yes);
     actionMap.set('no', no);
     actionMap.set('propose',propose);
-    actionMap.set('selectionner',selectionner)
-
+    actionMap.set('selectionner',selectionner);
 
 
     assistant.handleRequest(actionMap);
