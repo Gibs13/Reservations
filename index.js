@@ -289,9 +289,9 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         let rightTime;
         if (possibleTime == []) {
             return false;
-        } else if (!possibleTime[0] || assistant.data.timing==2) {
+        } else if (!possibleTime[0]) {
             rightTime = possibleTime[1];
-        } else if (!possibleTime[1] || assistant.data.timing==1) {
+        } else if (!possibleTime[1]) {
             rightTime = possibleTime[0];
         } else {
             rightTime = possibleTime[1]-time <= time-possibleTime[0] ? possibleTime[1] : possibleTime[0];
