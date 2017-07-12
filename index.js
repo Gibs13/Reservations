@@ -36,16 +36,57 @@ const CHANGE_STATE= "change";
 const PROPOSITION = ["My suggestion is ","I may suggest you ","A possible choice would be ","I allowed myself to choose ","Maybe "];
 const MISUNDERSTAND = ["Sorry, I didn't understand. ","What did you just said ? ","I didn't heared well. "];
 const AGREE = ["Do you agree ? ","Is it ok for you ? ","Is it alright ? "];
-const FINISH = ["May I place an order ? ","Is everything right ? ","May I proceed ? "];
+const FINISH = ["May I place a reservation ? ","Is everything right ? ","May I proceed ? "];
 const READY = ["A table is available ","There's still place ","It's possible to reserve "];
-const SUCCESS = ["Your reservation was completed under the name of ","Everything went well. The table was ordered with the name ","The order was made under the name : "];
+const SUCCESS = ["Your reservation was completed under the name of ","Everything went well. The table was ordered with the name ","The reservation was made under the name : "];
 const WELCOME = ["Welcome ! You can book a restaurant's table in Strasbourg. ","Hello ! I'm able to get a reservation for a restaurant in Strasbourg. ","Howdy ! Do you want a reservation in a Strasbourg's restaurant ? "];
 const BYE = ["Alright then, come back soon ! ","Well, goodbye. See you soon.","You're leaving yet ? Until next time !"];
 const CHANGE = ["What should I change ? ","Tell me what has to be modified. ","What has to be replaced ? "];
-const NOROOM = ["There is no room ","They haven't got any seats ","It's not possible to order "];
+const NOROOM = ["There is no room ","They haven't got any seats ","It's not possible to book "];
 
-const MONTH = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const DAY = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+const MONTH = ["January",
+"February",
+"March",
+"April",
+"May",
+"June",
+"July",
+"August",
+"September",
+"October",
+"November",
+"December"];
+const DAY = ["first",
+"second",
+"third",
+"fourth",
+"fifth",
+"sixth",
+"seventh",
+"eighth",
+"ninth",
+"tenth",
+"eleventh",
+"twelfth",
+"thirteenth",
+"fourteenth",
+"fifteenth",
+"sixteenth",
+"seventeenth",
+"eighteenth",
+"nineteenth",
+"twentieth",
+"twenty-first",
+"twenty-second",
+"twenty-third",
+"twenty-fourth",
+"twenty-fifth",
+"twenty-sixth",
+"twenty-seventh",
+"twenty-eighth",
+"twenty-ninth",
+"thirtieth",
+"thirty-first"];
 const IMAGE = 'https://reservation01.herokuapp.com/images/'
 
 
@@ -181,6 +222,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             date = date.substring(0,4)+'-'+('0'+month.toString()).slice(-2)+'-'+('0'+day.toString()).slice(-2);
 
         } else {
+            assistant.data.date = date;
             assistant.data.time = T;
         }
 
@@ -208,7 +250,27 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         let cln = assistant.data.cln;
         let cn = assistant.data.cn;
         let ct = assistant.data.ct;
-        return (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant.toLowerCase()+" ":"")+(cd?"on "+assistant.data.date.substring(5)+" ":"")+(ct?"at "+assistant.data.time+" ":"")+(cln?"with the name "+assistant.data.name+" ":"")+". ";
+        let dateMessage;
+        let timeMessage;
+        if (!cd) {dateMessage="";}
+        else {
+            let date = assistant.data.date;
+            let day = today.getDate();
+        if (day == parseInt(date.substring(8,10))) {
+            dateMessage = "today ";
+        } else if (day+1 == parseInt(date.substring(8,10))) {
+            dateMessage = "tomorrow ";
+        } else if (day+2 == parseInt(date.substring(8,10))) {
+            dateMessage = "in two days ";
+        } else {
+            dateMessage = "on the "+DAY[parseInt(date.slice(8))-1]+" of "+MONTH[parseInt(date.slice(5,7))-1]+" ";
+        }}
+        if (!ct) {timeMessage="";}
+        else {
+            let time = assistant.data.time;
+            timeMessage = "at "+(time.slice(0,2)<10?time.slice(1,2):time.slice(0,2))+" hours "+(time.slice(3,5)!=0?time.slice(3,5)+" minutes ":"");
+        }
+        return (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant.toLowerCase()+" ":"")+dateMessage+timeMessage+(cln?"with the name "+assistant.data.name+" ":"")+". ";
     }
 
     function reserver (assistant) {
@@ -263,7 +325,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
                     let rightTime;
                     if (time != heure) {
                         if (!assistant.data.proposition) {
-                            assistant.data.message += "You can only order a bit earlier. ";
+                            assistant.data.message += "You can only reserve a bit earlier. ";
                         }
                     } 
                     rightTime = heure;
@@ -287,7 +349,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             }
         }
         let rightTime;
-        if (possibleTime == []) {
+        if (!possibleTime[0] && !possibleTime[1]) {
             return false;
         } else if (!possibleTime[0]) {
             rightTime = possibleTime[1];
