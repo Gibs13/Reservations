@@ -210,6 +210,10 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         if (T === false) {
             //Pas de place ce jour
             console.log("Pas de place ce jour");
+            if (tries == 0 && !assistant.data.proposition) {
+                assistant.data.proposition = true;
+                assistant.data.message += R(NOROOM) + "this day. ";
+            }
             if (tries == 7) {
                 break;
             }
@@ -360,6 +364,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         }
         assistant.data.creneau = rightTime == possibleTime[0] ? possibleTime[2] : possibleTime[3];
         assistant.data.ct = 1;
+        assistant.data.proposition = true;
         let answer = ('0' + Math.floor(rightTime/60).toString()).slice(-2) + ':' + ('0' + (rightTime-Math.floor(rightTime/60)*60).toString()).slice(-2);
         console.log("temps proposé : " + answer);
         return answer;
