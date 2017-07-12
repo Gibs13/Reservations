@@ -408,11 +408,11 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         assistant.data.name = assistant.getContextArgument('reserve','last-name').value;
         assistant.data.places = parseInt(assistant.getContextArgument('reserve','number').value);
         let todayNormalized = today.getFullYear().toString()+'-'+('0' + (today.getMonth()+1).toString()).slice(-2)+'-'+('0' + (today.getDate()).toString()).slice(-2);
-        assistant.data.cd = assistant.getContextArgument('reserve','cd').value;
-        assistant.data.cr = assistant.getContextArgument('reserve','cr').value;
-        assistant.data.cln = assistant.getContextArgument('reserve','cln').value;
-        assistant.data.cn = assistant.getContextArgument('reserve','cn').value;
-        assistant.data.ct = assistant.getContextArgument('reserve','ct').value;
+        assistant.data.cd = parseInt(assistant.getContextArgument('reserve','cd').value);
+        assistant.data.cr = parseInt(assistant.getContextArgument('reserve','cr').value);
+        assistant.data.cln = parseInt(assistant.getContextArgument('reserve','cln').value);
+        assistant.data.cn = parseInt(assistant.getContextArgument('reserve','cn').value);
+        assistant.data.ct = parseInt(assistant.getContextArgument('reserve','ct').value);
 
         let restaurant = assistant.data.restaurant;
         console.log(restaurant);
