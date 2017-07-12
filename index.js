@@ -274,8 +274,15 @@ function modify(resto, date, creneau, places, valeur, nom, time){
             let time = assistant.data.time;
             timeMessage = "at "+(time.slice(0,2)<10?time.slice(1,2):time.slice(0,2))+" hours "+(time.slice(3,5)!=0?time.slice(3,5)+" minutes ":"");
         }
-        return (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant.toLowerCase()+" ":"")+dateMessage+timeMessage+(cln?"with the name "+assistant.data.name+" ":"")+". ";
+        let message = (cn?"for "+assistant.data.places+" person"+(assistant.data.places>1?"s ":" "):"")+(cr?"the restaurant "+assistant.data.restaurant.toLowerCase()+" ":"")+dateMessage+timeMessage+(cln?"with the name "+assistant.data.name+" ":"")+". ";
+        assistant.data.cd=0;
+        assistant.data.cr=0;
+        assistant.data.cln=0;
+        assistant.data.cn=0;
+        assistant.data.ct=0;
+        return message;
     }
+
 
     function reserver (assistant) {
         let restaurant = assistant.data.restaurant;
