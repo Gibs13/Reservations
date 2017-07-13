@@ -99,7 +99,7 @@ app.post('/', function (req, res) {
     console.log("today : " + today.getDate()+" "+(today.getMonth()+1)+" "+today.getHours()+" "+today.getMinutes());
 
     // Pour selectionner un element d'une liste
-    function R(assistant, array) {
+    function R(array) {
         return array[Math.floor(Math.random() * (array.length))];
     }
 
@@ -232,7 +232,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
 
         }  
         if (T === false) {
-            assistant.ask(R(assistant, NOROOM) + "this day and the week after. You may try another date. ");
+            assistant.ask(R(NOROOM) + "this day and the week after. You may try another date. ");
             return;
         }
 
@@ -240,10 +240,10 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         
         assistant.data.state = YES_NO_STATE;
         if (assistant.data.proposition) {
-            assistant.ask(assistant.data.message + R(assistant, PROPOSITION) + message + R(assistant, AGREE));
+            assistant.ask(assistant.data.message + R(PROPOSITION) + message + R(AGREE));
             return;
         } else {
-            assistant.ask(assistant.data.message + R(assistant, READY) + message + R(assistant, FINISH));
+            assistant.ask(assistant.data.message + R(READY) + message + R(FINISH));
             return;
         }        
     }
@@ -296,7 +296,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
                 console.log("valide");
                 let valeur = horaires[date][creneau].substring(0,6) + (placeRestante-places).toString();
                 modify(restaurant,horaires[date][horaires[date].length-1],String.fromCharCode(66 + creneau),places,valeur,name,assistant.data.time);
-                assistant.tell(R(assistant, SUCCESS) + name);
+                assistant.tell(R(SUCCESS) + name);
             } else {
                 console.log("invalide");
                 assistant.ask("There was an error, the places are not available anymore. ");
@@ -392,7 +392,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
 
 
         assistant.data.state = WELCOME_STATE;
-        assistant.ask(R(assistant, WELCOME));
+        assistant.ask(R(WELCOME));
     }
 
     function reserve (assistant) {
@@ -473,7 +473,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
         } else
         if (state == YES_NO_STATE) {
             assistant.data.state = RESERVE_STATE;
-            assistant.ask(R(assistant, CHANGE));
+            assistant.ask(R(CHANGE));
             return;
         } else {
             assistant.ask("I'm not sure of what you wanted. ");
@@ -482,7 +482,7 @@ function modify(resto, date, creneau, places, valeur, nom, time){
     }
 
     function quit (assistant) {
-        assistant.tell(R(assistant, BYE));
+        assistant.tell(R(BYE));
     }
 
     function selectionner (assistant) {
